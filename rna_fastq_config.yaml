@@ -1,0 +1,20 @@
+---
+  Patient_001:
+    Sample_FR4EV:
+      type: 'normal'
+      libraries:
+        Stewart_241029_RNA:
+          runlanes:
+            S124_L005:
+              fastq:
+                R1: /cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_Stewart_241029_RNA/FR4EV_S124_L005_R1_001.fastq.gz
+                R2: /cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_Stewart_241029_RNA/FR4EV_S124_L005_R2_001.fastq.gz
+    Sample_FR4TP53INP1:
+      type: 'tumour'
+      libraries:
+        Stewart_241029_RNA:
+          runlanes:
+            S125_L005:
+              fastq:
+                R1: /cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_Stewart_241029_RNA/FR4TP53INP1_S125_L005_R1_001.fastq.gz
+                R2: /cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_Stewart_241029_RNA/FR4TP53INP1_S125_L005_R2_001.fastq.gz
