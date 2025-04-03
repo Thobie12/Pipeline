@@ -1,0 +1,177 @@
+---
+# common parameters
+project_name: Practice # use the project name as the value
+output_dir: /cluster/home/t922316uhn/Practice/RNASeq/ # use the path to the output directory as the value
+seq_type: rna # must be one of exome, targeted, rna or wgs
+seq_center: PMGC
+platform: Illumina
+flowcell_type: random # one of random or patterned, depends on the instrument used: https://knowledge.illumina.com/instrumentation/general/instrumentation-general-faq-list/000007786
+hpc_group:
+# reference files
+ref_type: hg38
+star_reference_dir: /cluster/projects/pughlab/references/STAR/STAR_2.7.2b_GRCh38_gencode_v31/
+reference: /cluster/tools/data/genomes/human/hg38/iGenomes/Sequence/WholeGenomeFasta/genome.fa
+reference_gtf: /cluster/projects/pughlab/references/gencode/GRCh38/gencode.v31.annotation.gtf
+star_fusion_reference_dir: /cluster/projects/pughlab/references/STAR-Fusion/GRCh38_gencode_v31_CTAT_lib_Oct012019/ctat_genome_lib_build_dir/
+rsem_reference: /cluster/projects/pughlab/references/RSEM/GRCh38/v31/grch38.v31
+fusioncatcher_reference_dir: /cluster/tools/software/centos7/fusioncatcher/1.20/fusioncatcher/data/current/
+dbsnp: /cluster/projects/pughlab/references/dbSNP/GRCh38/b151/dbSNP_GRCh38p7_b151_common_chr.vcf.gz
+gatk_known_1000g: /cluster/tools/data/genomes/human/hg38/hg38bundle/1000G_phase1.snps.high_confidence.hg38.vcf.gz
+gatk_known_indels: /cluster/tools/data/genomes/human/hg38/hg38bundle/Homo_sapiens_assembly38.known_indels.vcf.gz
+gatk_known_mills: /cluster/tools/data/genomes/human/hg38/hg38bundle/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz
+# tool versions - IMPORTANT ! REVIEW TO CONFIRM ALL VERSIONS ARE UPDATED/CORRECT AND LOADABLE!!!
+perl_version: 5.40.0 #updated perl version to 5.40.0, code won't work otherwise
+fastqc_version: 0.11.5
+star_version: 2.7.2b
+vcftools_version: 0.1.15
+samtools_version: 1.9
+picard_version: 2.6.0
+rna_seqc_version: 1.1.8
+r_version: 4.1.0
+bwa_version: 0.7.15
+mavis_version: 2.2.5
+star_fusion_version: 1.8.1
+star_fusion_path: /cluster/projects/pughlab/bin/STAR-Fusion-1.8.1/STAR-Fusion
+rsem_version: 1.3.0
+gatk_version: 3.8
+fusioncatcher_version: 1.20
+arriba_version: 2.3.0
+vcf2maf_version: 1.6.17 
+# tool specific parameters
+fastqc:
+    run: Y
+    parameters:
+        fastqc:
+            mem: 2G
+            time: '24:00:00'
+star:
+    run: Y
+    parameters:
+        star:
+            mem: 22G
+            time: '48:00:00'
+        markdup:
+            run: Y
+            java_mem: 6g
+            mem: 8G
+            time: '08:00:00'
+        rna_seqc:
+            java_mem: 4g
+            mem: 6G
+            time: '48:00:00'
+        combine_results:
+            mem: 4G
+            time: '04:00:00'
+star_fusion:
+    run: Y
+    parameters:
+        FusionInspect:
+        star_fusion:
+            mem: 6G
+            time: '24:00:00'
+        combine_results:
+            mem: 4G
+            time: '04:00:00'
+rsem:
+    run: Y
+    # For Illumina TruSeq Stranded protocols, please use 'reverse'
+    strandedness: reverse
+    parameters:
+        rsem:
+            mem: 4G
+            time: '12:00:00'
+        combine_results:
+            mem: 4G
+            time: '04:00:00'
+gatk:
+    run: Y
+    parameters:
+        split_cigar:
+            java_mem: 11g
+            mem: 12G
+            time: '24:00:00'
+        target_creator:
+            java_mem: 7g
+            mem: 8G
+            time: '24:00:00'
+        realign:
+            java_mem: 11g
+            mem: 12G
+            time: '24:00:00'
+        bqsr:
+            java_mem: 11g
+            mem: 12G
+            time:
+                normal: '24:00:00'
+                tumour: '48:00:00'
+        recalibrate:
+            java_mem: 11g
+            mem: 12G
+            time:
+                normal: '24:00:00'
+                tumour: '48:00:00'
+fusioncatcher:
+    run: Y
+    parameters:
+        fusioncatcher:
+            java_mem: 35g
+            mem: 36G
+            time: '72:00:00'
+        combine_results:
+            mem: 4G
+            time: '04:00:00'
+arriba:
+    run: Y
+    star_version: 2.7.9a
+    star_reference: /cluster/projects/pughlab/references/Arriba/STAR_2.7.9a_GRCh38_gencode_v31_plus_virus/
+    reference: /cluster/projects/pughlab/references/Arriba/hg38_plus_viral_genomes.fa
+    gtf: # /cluster/projects/pughlab/references/gencode/GRCh38/gencode.v31.annotation.gtf
+    parameters:
+        star:
+            mem: 38G
+            time: '48:00:00'
+            n_cpus: 1
+        arriba:
+            mem: 18G
+            time: '24:00:00'
+        quantify_virus:
+            mem: 1G
+            time: '04:00:00'
+        combine_results:
+            mem: 1G
+            time: '04:00:00'
+haplotype_caller:
+    run: Y
+    parameters:
+        haplotype_call:
+            java_mem: 11g
+            mem: 12G
+            time: '72:00:00'
+        filter_raw:
+            java_mem: 3g
+            mem: 4G
+            time: '12:00:00'
+        annotate:
+            vep_path: /cluster/tools/software/centos7/vep/98
+            vep_data: /cluster/projects/pughlab/references/VEP_cache/98
+            filter_vcf: /cluster/projects/pughlab/references/VEP_cache/ExAC_nonTCGA.r1.sites.hg19ToHg38.vep.vcf.gz 
+            buffer_size: 1000
+            n_cpus: 4
+            mem: 12G
+            time: '24:00:00'
+        combine_results:
+            mem: 12G
+            time: '08:00:00'
+mavis:
+    run: N
+    mem: 4G # increase this if the patient has multiple tumours and/or many SV callers were run
+    mavis_mem_limit: # in Mb, default is 16000; increase if individual steps are running out of memory
+    mavis_time_limit: # in seconds, default is 57600 ; increase if individual steps are running out of time
+    mavis_max_jobs: 200 # maximum number of jobs to submit at a time; decrease if hitting slurm job cap
+    mavis_annotations: /cluster/projects/pughlab/references/MAVIS_ref/ensembl79_hg38_annotations.json
+    mavis_masking: /cluster/projects/pughlab/references/MAVIS_ref/GRCh38_masking.tab
+    mavis_dgv_anno: /cluster/projects/pughlab/references/MAVIS_ref/dgv_hg38_variants.tab
+    mavis_cytoband: /cluster/projects/pughlab/references/MAVIS_ref/cytoBand.txt
+    mavis_draw_fusions_only: true
+    mavis_aligner: 'bwa mem'
+    mavis_bwa_ref: /cluster/projects/pughlab/references/bwa_index/hg38/genome.fa 
