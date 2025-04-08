@@ -1,4 +1,4 @@
-#This script is a collection of batch commands for managing and monitoring jobs on a SLURM cluster.
+##This script is a collection of batch commands for managing and monitoring jobs on a SLURM cluster.
 du -h . # Check disk usage of the current directory and all subdirectories
 du -sh * # Check disk usage of all files and directories in the current directory
 df -h # Check available disk space on all mounted filesystems
