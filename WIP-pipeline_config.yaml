@@ -37,7 +37,7 @@ gatk_version: 3.8
 fusioncatcher_version: 1.20
 arriba_version: 2.3.0
 vcf2maf_version: 1.6.22
-vcf2maf_version_path: 
+vcf2maf_version_path: /cluster/home/t922316uhn/vcf2maf-1.6.22  # include if path needed otherwise delete
 
 # tool specific parameters
 fastqc:
