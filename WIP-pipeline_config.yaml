@@ -1,7 +1,7 @@
 ---
 # common parameters
 project_name: FR4_KMS_Apr2025 # use the project name as the value
-output_dir: q/FR4 # use the path to the output directory as the value
+output_dir: /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/FR4 # use the path to the output directory as the value
 seq_type: rna # must be one of exome, targeted, rna or wgs
 seq_center: PMGC
 platform: Illumina
@@ -26,7 +26,7 @@ star_version: 2.7.2b
 vcftools_version: 0.1.15
 samtools_version: 1.20 #changed samtools version to 1.20
 picard_version: 2.6.0
-rna_seqc_version: 1modu.1.8
+rna_seqc_version: 1.1.8
 r_version: 4.1.0
 bwa_version: 0.7.15
 mavis_version: 2.2.5
@@ -38,32 +38,41 @@ fusioncatcher_version: 1.20
 arriba_version: 2.3.0
 vcf2maf_version: 1.6.22
 vcf2maf_version_path: /cluster/home/t922316uhn/vcf2maf-1.6.22  # include if path needed otherwise delete
-
 # tool specific parameters
 fastqc:
     run: Y
     parameters:
         fastqc:
-            mem: 2G
+            mem: 4G
             time: '24:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
 star:
     run: Y
     parameters:
         star:
             mem: 24G
             time: '72:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         markdup:
             run: Y
             java_mem: 7g
             mem: 8G
             time: '08:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         rna_seqc:
             java_mem: 7g
             mem: 8G
             time: '72:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         combine_results:
             mem: 4G
             time: '04:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
 star_fusion:
     run: Y
     parameters:
@@ -71,9 +80,13 @@ star_fusion:
         star_fusion:
             mem: 18G
             time: '3-24:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         combine_results:
             mem: 8G
             time: '08:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
 rsem:
     run: Y
     # For Illumina TruSeq Stranded protocols, please use 'reverse'
@@ -82,9 +95,13 @@ rsem:
         rsem:
             mem: 16G
             time: '3-24:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         combine_results:
             mem: 8G
             time: '08:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
 gatk:
     run: Y
     parameters:
@@ -92,26 +109,36 @@ gatk:
             java_mem: 15g
             mem: 16G
             time: '24:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         target_creator:
             java_mem: 15g
             mem: 16G
             time: '24:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         realign:
             java_mem: 15g
             mem: 16G
             time: '24:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         bqsr:
             java_mem: 15g
             mem: 16G
             time:
-                normal: '24:00:00'
+                normal: '48:00:00'
                 tumour: '48:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         recalibrate:
             java_mem: 11g
             mem: 12G
             time:
                 normal: '48:00:00'
                 tumour: '48:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
 fusioncatcher:
     run: Y
     parameters:
@@ -119,9 +146,13 @@ fusioncatcher:
             java_mem: 56g
             mem: 64G
             time: '5-24:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         combine_results:
             mem: 12G
             time: '08:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
 arriba:
     run: Y
     star_version: 2.7.9a
@@ -133,15 +164,23 @@ arriba:
             mem: 64G
             time: '48:00:00'
             n_cpus: 1
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         arriba:
             mem: 29G
             time: '24:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         quantify_virus:
             mem: 4G
             time: '8:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         combine_results:
             mem: 4G
             time: '08:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
 haplotype_caller:
     run: Y
     parameters:
@@ -149,10 +188,14 @@ haplotype_caller:
             java_mem: 15g
             mem: 16G
             time: '72:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         filter_raw:
             java_mem: 3g
             mem: 4G
             time: '12:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         annotate:
             vcf2maf_path: /cluster/home/t922316uhn/vcf2maf-1.6.22/vcf2maf.pl
             vep_path: /cluster/tools/software/centos7/vep/112 # update to 112 or latest version?? START FROM VEP stuff
@@ -162,12 +205,18 @@ haplotype_caller:
             n_cpus: 4
             mem: 30G
             time: '24:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
         combine_results:
             mem: 12G
             time: '08:00:00'
+            mail-user: oluwatobi.agbede@uhn.ca
+            mail-type: ALL
 mavis:
     run: Y
     mem: 16G # increase this if the patient has multiple tumours and/or many SV callers were run
+    mail-user: oluwatobi.agbede@uhn.ca
+    mail-type: ALL
     mavis_mem_limit: # in Mb, default is 16000; increase if individual steps are running out of memory
     mavis_time_limit: # in seconds, default is 57600 ; increase if individual steps are running out of time
     mavis_max_jobs: 200 # maximum number of jobs to submit at a time; decrease if hitting slurm job cap
