@@ -128,7 +128,7 @@ KMS26: # use the patient ID as the key
               R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_KO_S128_L008_R1_001.fastq.gz"
               R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_KO_S128_L008_R2_001.fastq.gz"
   S126: # use the sample ID as the key
-    type: 'normal' # use 'normal' or 'tumour' as the value
+    type: 'tumour' # use 'normal' or 'tumour' as the value
     libraries:
       B22VJNCLT3: # use the library name as the key
         runlanes:
