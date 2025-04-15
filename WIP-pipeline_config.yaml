@@ -1,12 +1,12 @@
 ---
 # common parameters
-project_name: FR4TP53 # use the project name as the value
-output_dir: /cluster/home/t922316uhn/Practice/RNASeq/ # use the path to the output directory as the value
+project_name: FR4_KMS_Apr2025 # use the project name as the value
+output_dir: q/FR4 # use the path to the output directory as the value
 seq_type: rna # must be one of exome, targeted, rna or wgs
 seq_center: PMGC
 platform: Illumina
 flowcell_type: random # one of random or patterned, depends on the instrument used: https://knowledge.illumina.com/instrumentation/general/instrumentation-general-faq-list/000007786
-hpc_group:
+hpc_group: pughlab
 # reference files
 ref_type: hg38
 star_reference_dir: /cluster/projects/pughlab/references/STAR/STAR_2.7.2b_GRCh38_gencode_v31/
@@ -26,14 +26,14 @@ star_version: 2.7.2b
 vcftools_version: 0.1.15
 samtools_version: 1.20 #changed samtools version to 1.20
 picard_version: 2.6.0
-rna_seqc_version: 1.1.8
+rna_seqc_version: 1modu.1.8
 r_version: 4.1.0
 bwa_version: 0.7.15
 mavis_version: 2.2.5
 star_fusion_version: 1.8.1
 star_fusion_path: /cluster/projects/pughlab/bin/STAR-Fusion-1.8.1/STAR-Fusion
 rsem_version: 1.3.0
-gatk_version: 3.8
+gatk_version: 4.6.0.0
 fusioncatcher_version: 1.20
 arriba_version: 2.3.0
 vcf2maf_version: 1.6.22
@@ -50,17 +50,17 @@ star:
     run: Y
     parameters:
         star:
-            mem: 22G
-            time: '48:00:00'
+            mem: 24G
+            time: '72:00:00'
         markdup:
             run: Y
-            java_mem: 6g
+            java_mem: 7g
             mem: 8G
             time: '08:00:00'
         rna_seqc:
-            java_mem: 4g
-            mem: 6G
-            time: '48:00:00'
+            java_mem: 7g
+            mem: 8G
+            time: '72:00:00'
         combine_results:
             mem: 4G
             time: '04:00:00'
@@ -69,40 +69,40 @@ star_fusion:
     parameters:
         FusionInspect:
         star_fusion:
-            mem: 6G
-            time: '24:00:00'
+            mem: 18G
+            time: '3-24:00:00'
         combine_results:
-            mem: 4G
-            time: '04:00:00'
+            mem: 8G
+            time: '08:00:00'
 rsem:
     run: Y
     # For Illumina TruSeq Stranded protocols, please use 'reverse'
     strandedness: reverse
     parameters:
         rsem:
-            mem: 4G
-            time: '12:00:00'
+            mem: 16G
+            time: '3-24:00:00'
         combine_results:
-            mem: 4G
-            time: '04:00:00'
+            mem: 8G
+            time: '08:00:00'
 gatk:
     run: Y
     parameters:
         split_cigar:
-            java_mem: 11g
-            mem: 12G
+            java_mem: 15g
+            mem: 16G
             time: '24:00:00'
         target_creator:
-            java_mem: 7g
-            mem: 8G
+            java_mem: 15g
+            mem: 16G
             time: '24:00:00'
         realign:
-            java_mem: 11g
-            mem: 12G
+            java_mem: 15g
+            mem: 16G
             time: '24:00:00'
         bqsr:
-            java_mem: 11g
-            mem: 12G
+            java_mem: 15g
+            mem: 16G
             time:
                 normal: '24:00:00'
                 tumour: '48:00:00'
@@ -110,18 +110,18 @@ gatk:
             java_mem: 11g
             mem: 12G
             time:
-                normal: '24:00:00'
+                normal: '48:00:00'
                 tumour: '48:00:00'
 fusioncatcher:
     run: Y
     parameters:
         fusioncatcher:
-            java_mem: 35g
-            mem: 36G
-            time: '72:00:00'
+            java_mem: 56g
+            mem: 64G
+            time: '5-24:00:00'
         combine_results:
-            mem: 4G
-            time: '04:00:00'
+            mem: 12G
+            time: '08:00:00'
 arriba:
     run: Y
     star_version: 2.7.9a
@@ -130,43 +130,44 @@ arriba:
     gtf: # /cluster/projects/pughlab/references/gencode/GRCh38/gencode.v31.annotation.gtf
     parameters:
         star:
-            mem: 38G
+            mem: 64G
             time: '48:00:00'
             n_cpus: 1
         arriba:
-            mem: 18G
+            mem: 29G
             time: '24:00:00'
         quantify_virus:
-            mem: 1G
-            time: '04:00:00'
+            mem: 4G
+            time: '8:00:00'
         combine_results:
-            mem: 1G
-            time: '04:00:00'
+            mem: 4G
+            time: '08:00:00'
 haplotype_caller:
     run: Y
     parameters:
         haplotype_call:
-            java_mem: 11g
-            mem: 12G
+            java_mem: 15g
+            mem: 16G
             time: '72:00:00'
         filter_raw:
             java_mem: 3g
             mem: 4G
             time: '12:00:00'
         annotate:
+            vcf2maf_path: /cluster/home/t922316uhn/vcf2maf-1.6.22/vcf2maf.pl
             vep_path: /cluster/tools/software/centos7/vep/112 # update to 112 or latest version?? START FROM VEP stuff
             vep_data: /cluster/projects/pughlab/references/VEP_cache/112 # update to 112 or latest version
             filter_vcf: /cluster/projects/pughlab/references/VEP_cache/ExAC_nonTCGA.r1.sites.hg19ToHg38.vep.vcf.gz 
             buffer_size: 1000
             n_cpus: 4
-            mem: 12G
+            mem: 30G
             time: '24:00:00'
         combine_results:
             mem: 12G
             time: '08:00:00'
 mavis:
-    run: N
-    mem: 4G # increase this if the patient has multiple tumours and/or many SV callers were run
+    run: Y
+    mem: 16G # increase this if the patient has multiple tumours and/or many SV callers were run
     mavis_mem_limit: # in Mb, default is 16000; increase if individual steps are running out of memory
     mavis_time_limit: # in seconds, default is 57600 ; increase if individual steps are running out of time
     mavis_max_jobs: 200 # maximum number of jobs to submit at a time; decrease if hitting slurm job cap
