@@ -43,8 +43,8 @@ FR4: # use the patient ID as the key
               R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_Stewart_241029_RNA/FR4TP53INP1_S125_L008_R1_001.fastq.gz"
               R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_Stewart_241029_RNA/FR4TP53INP1_S125_L008_R2_001.fastq.gz"
   S123: # use the sample ID as the key  
-  type: 'tumour' # use 'normal' or 'tumour' as the value
-  libraries:
+    type: 'tumour' # use 'normal' or 'tumour' as the value
+    libraries:
     Stewart_241029_RNA: # use the library name as the key
       runlanes:
         L005: 
@@ -64,8 +64,8 @@ FR4: # use the patient ID as the key
             R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_Stewart_241029_RNA/FR4res_S123_L008_R1_001.fastq.gz"
             R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_Stewart_241029_RNA/FR4res_S123_L008_R2_001.fastq.gz"
   S122: # use the sample ID as the key  
-  type: 'tumour' # use 'normal' or 'tumour' as the value
-  libraries:
+    type: 'tumour' # use 'normal' or 'tumour' as the value
+    libraries:
     Stewart_241029_RNA: # use the library name as the key
       runlanes:
         L005: 
