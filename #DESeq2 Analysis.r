@@ -9,20 +9,22 @@
 #install.packages("BiocManager"); BiocManager::install("clusterProfiler")
 #BiocManager::install(c("org.Hs.eg.db", "enrichplot"))
 #BiocManager::install(c("ReactomePA", "DOSE"))
+#install.packages("circlize")
 
 # Load libraries
 setwd("/cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/R") # Set working directory here
-library(DESeq2)
 library(ggplot2)
 library(pheatmap)
 library(apeglm)
 library(EnhancedVolcano)
 library(DESeq2)
 library(clusterProfiler)
-library(clusterProfiler)
+library(enrichplot)
+library(circlize)
+library(dplyr)
+library(readr)
+library(stringr)
 library(org.Hs.eg.db)
-library(enrichplot)
-library(enrichplot)
 library(ReactomePA)
 library(DOSE)
 
@@ -79,7 +81,7 @@ plotPCA(vsd, intgroup = "condition")  # replace with your group
 
 
 # Get top 20 significant genes and plot heatmap
-top_genes <- head(order(res$padj), 20)
+top_genes <- order(res$padj, na.last = NA)[1:20]
 mat <- assay(vsd)[top_genes, ]
 mat <- mat - rowMeans(mat)
 pheatmap(mat, annotation_col = coldata_FR4all)
@@ -101,7 +103,7 @@ EnhancedVolcano(res,
     title = 'Volcano Plot')
 plotPCA(vsd, intgroup = "Condition")
 plotDispEsts(dds, main = "Dispersion Estimates")
-top_genes <- head(order(res$padj), 20)
+top_genes <- head(order(res$padj, na.last = NA), 20)
 mat <- assay(vsd)[top_genes, ]
 mat <- mat - rowMeans(mat)
 pheatmap(mat, annotation_col = as.data.frame(colData(dds)[, "Condition", drop = FALSE]),
@@ -142,10 +144,11 @@ pheatmap(mat, annotation_col = as.data.frame(colData(dds)[, "Condition", drop = 
 dev.off()
 
 ## 6. GSEA Analysis
-sig_genes <- rownames(res[which(res$padj < 0.05), ])
-entrez_ids <- mapIds(org.Hs.eg.db, keys = sig_genes, keytype = "ENSEMBL", column = "ENTREZID")
 # Step 1: Remove version numbers (e.g., ".1" at the end)
 sig_genes_clean <- gsub("\\..*$", "", sig_genes)
+sig_genes <- rownames(res[which(res$padj < 0.05), ])
+entrez_ids <- mapIds(org.Hs.eg.db, keys = sig_genes, keytype = "ENSEMBL", column = "ENTREZID")
+
 # Step 2: Convert to Entrez
 entrez_ids <- mapIds(org.Hs.eg.db,
                      keys = sig_genes_clean,
@@ -177,7 +180,9 @@ reactome_res <- enrichPathway(gene = entrez_ids,
                               readable = TRUE)
 # Step 5: GSEA
 gene_list <- res$log2FoldChange
-names(gene_list) <- gsub("\\..*$", "", rownames(res))  # clean names
+names(gene_list) <- ifelse(grepl("\\..*$", rownames(res)), 
+                           gsub("\\..*$", "", rownames(res)), 
+                           rownames(res))  # clean names only if version suffix exists
 gene_list <- mapIds(org.Hs.eg.db,
                     keys = names(gene_list),
                     keytype = "ENSEMBL",
@@ -225,4 +230,82 @@ write.csv(as.data.frame(kegg_res), "KEGG_results.csv")
 write.csv(as.data.frame(reactome_res), "Reactome_results.csv")
 write.csv(as.data.frame(gsea_res), "GSEA_results.csv")
 
+## Fusion Analysis
+fusion_data <- read_tsv("2025-04-17_FR4TP53_fusioncatcher_output_long.tsv") # path to fusioncatcher output long format
+fusion_clean <- fusion_data %>%
+  filter(!is.na(`Gene_1_symbol`) & !is.na(`Gene_2_symbol`)) %>%
+  select(Gene_1 = `Gene_1_symbol`,
+         Chr1   = `Gene_1_chromosome`,
+         Pos1   = `Gene_1_position`,
+         Gene_2 = `Gene_2_symbol`,
+         Chr2   = `Gene_2_chromosome`,
+         Pos2   = `Gene_2_position`)
+circos_data <- fusion_clean %>%
+  mutate(
+    Pos1_start = Pos1 - 1000,
+    Pos1_end   = Pos1 + 1000,
+    Pos2_start = Pos2 - 1000,
+    Pos2_end   = Pos2 + 1000
+  ) %>%
+  select(Chr1, Pos1_start, Pos1_end, Chr2, Pos2_start, Pos2_end)
+
+colnames(fusion_data)
+
+#input
+nrow(circos_data)
+head(fusion_data$`Fusion_point_for_gene_1.5end_fusion_partner.`, 10)
+fusion_clean <- fusion_data %>%
+  filter(!is.na(`Fusion_point_for_gene_1.5end_fusion_partner.`),
+         !is.na(`Fusion_point_for_gene_2.3end_fusion_partner.`)) %>%
+  mutate(
+    Chr1 = paste0("chr", str_extract(`Fusion_point_for_gene_1.5end_fusion_partner.`, "^[^:]+")),
+    Pos1 = as.numeric(str_extract(`Fusion_point_for_gene_1.5end_fusion_partner.`, "(?<=:)[0-9]+")),
+    Chr2 = paste0("chr", str_extract(`Fusion_point_for_gene_2.3end_fusion_partner.`, "^[^:]+")),
+    Pos2 = as.numeric(str_extract(`Fusion_point_for_gene_2.3end_fusion_partner.`, "(?<=:)[0-9]+")),
+    Gene_1 = `Gene_1_symbol.5end_fusion_partner.`,
+    Gene_2 = `Gene_2_symbol.3end_fusion_partner.`
+  ) %>%
+  filter(!is.na(Chr1), !is.na(Chr2), !is.na(Pos1), !is.na(Pos2))
+
+circos_data <- fusion_clean %>%
+  mutate(
+    Pos1_start = Pos1 - 1000,
+    Pos1_end   = Pos1 + 1000,
+    Pos2_start = Pos2 - 1000,
+    Pos2_end   = Pos2 + 1000
+  ) %>%
+  select(Chr1, Pos1_start, Pos1_end, Chr2, Pos2_start, Pos2_end)
+
+cat("Number of fusion links: ", nrow(circos_data), "\n")
+
+circos_data <- fusion_clean %>%
+  mutate(
+    Pos1_start = Pos1 - 1000,
+    Pos1_end = Pos1 + 1000,
+    Pos2_start = Pos2 - 1000,
+    Pos2_end = Pos2 + 1000
+  ) %>%
+  select(Chr1, Pos1_start, Pos1_end, Chr2, Pos2_start, Pos2_end)
+
+circos.clear()
+circos.par("track.height" = 0.05)
+circos.initializeWithIdeogram(species = "hg19")
+
+circos.genomicLink(
+  region1 = circos_data[, 1:3],
+  region2 = circos_data[, 4:6],
+  col = rand_color(nrow(circos_data), transparency = 0.4)
+)
+# Save the circos plot
+circos.clear()
+circos.par("track.height" = 0.05)
+circos.initializeWithIdeogram(species = "hg19")
+
+circos.genomicLink(
+  region1 = circos_data[, 1:3],
+  region2 = circos_data[, 4:6],
+  col = rand_color(nrow(circos_data), transparency = 0.4)
+)
+
+dev.off()
 #savehistory("DEgenecode.R") - code to save history
