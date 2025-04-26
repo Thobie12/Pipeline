@@ -11,6 +11,7 @@ salloc -c 1 -p short -t 1:0:0 --mem 1G # request a short job if needed, remove -
 free -h # Check memory usage
 sacct --job JOBID # Check the status of a completed job
 #things to change, perl version, lik to VCF2MAF, VEP Version
+sinfo -o "%20P %10a %10l %10c %10m %10e %10D %N" #check memory on nodes
 
 
 
