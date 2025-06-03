@@ -1,0 +1,6 @@
+#SBATCH Codes to import all files
+cp /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/KMS26/Arriba/*.tsv .
+cp /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/KMS26/FusionCatcher/*.tsv .
+cp /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/KMS26/RSEM/*.tsv .
+cp /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/KMS26/STAR-Fusion/*.tsv .
+cp /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/KMS26/STAR/*.tsv .
