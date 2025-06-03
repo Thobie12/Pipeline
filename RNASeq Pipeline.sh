@@ -10,3 +10,12 @@ perl /cluster/home/t922316uhn/pipeline-suite/pughlab_rnaseq_pipeline.pl \
 -c slurm \
 --remove \
 --dry-run # --dry-run is optional, it will not run the pipeline, just show what will be done, remove if you want to run the pipeline
+
+
+perl /cluster/home/t922316uhn/pipeline-suite/pughlab_rnaseq_pipeline.pl \
+-t /cluster/home/t922316uhn/pipeline-suite/configs/rna_pipeline_config.yaml \ 
+-d /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/Combined/rna_fastq_config.yaml \
+--summarize \
+-c slurm \
+--remove \
+--dry-run # --dry-run is optional, it will not run the pipeline, just show what will be done, remove if you want to run the pipeline
