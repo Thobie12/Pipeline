@@ -12,7 +12,7 @@
 #install.packages("circlize")
 
 # Load libraries
-setwd("/cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/R") # Set working directory here
+setwd("/cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/KMS26/RSEM") # Set working directory here
 library(ggplot2)
 library(pheatmap)
 library(apeglm)
@@ -28,8 +28,8 @@ library(org.Hs.eg.db)
 library(ReactomePA)
 library(DOSE)
 
-counts_FR4all <- read.csv("/cluster/home/t922316uhn/R/RSEMfr4.tsv", sep = "\t", row.names = 1, header = TRUE, stringsAsFactors = TRUE) #link for RSEM expected count data
-coldata_FR4all <- read.csv("metadata2.tsv", sep = "\t", header = TRUE, row.names = 1 ) #link for metadata if it exists; make as a tsv file using nanos and tab to separate entry
+counts_FR4all <- read.csv("2025-04-21_FR4_KMS26_Apr2025_rsem_expected_counts.tsv", sep = "\t", row.names = 1, header = TRUE, stringsAsFactors = TRUE) #link for RSEM expected count data
+coldata_FR4all <- read.csv("metadata.tsv", sep = "\t", header = TRUE, row.names = 1 ) #link for metadata if it exists; make as a tsv file using nanos and tab to separate entry
 nrow(coldata_FR4all) # Check number of rows in coldata
 colnames(coldata_FR4all) # Check column names in coldata
 geneinfo_FR4all <- counts_FR4all[, 1:3] # Extract gene information
@@ -40,6 +40,62 @@ coldata_FR4all$Condition <- as.factor(coldata_FR4all$Condition) # Convert condit
 dds <- DESeqDataSetFromMatrix(countData = CleanedCounts_FR4all,
                               colData = coldata_FR4all,
                               design = ~ Condition)
+#Clustering before dds
+
+#Clustering independently: without any grouping
+# 1. Calculate sample-to-sample distances
+vsd <- vst(dds)
+sampleDists <- dist(t(assay(vsd)))  # transpose so samples are compared, not genes
+
+# 2. Turn distance into a matrix
+sampleDistMatrix <- as.matrix(sampleDists)
+
+# 3. Label rows and columns with sample names
+rownames(sampleDistMatrix) <- colnames(vsd)
+colnames(sampleDistMatrix) <- colnames(vsd)
+
+pdf("Preplots.pdf") #test plots for clustering
+# 4. Cluster and plot heatmap
+pheatmap(sampleDistMatrix, 
+         clustering_distance_rows = sampleDists,
+         clustering_distance_cols = sampleDists,
+         show_rownames = TRUE,
+         show_colnames = TRUE,
+         main = "Sample-to-sample distance heatmap")
+# Plot PCA
+#Perform vst transformation
+vsd <- vst(dds)
+
+# Perform PCA without any grouping variable (no intgroup argument)
+# Perform PCA without grouping
+pcaData <- prcomp(t(assay(vsd)))$x
+pcaData <- as.data.frame(pcaData)
+pcaData$Sample <- rownames(pcaData)  # Add sample names for labeling
+
+# Create PCA plot using ggplot
+library(ggplot2)
+p <- ggplot(pcaData, aes(x = PC1, y = PC2)) + 
+  geom_point(aes(color = rownames(pcaData)), size = 3) +
+  labs(title = "PCA of Samples (no grouping)", 
+       x = paste0("PC1: ", round(100 * pcaData$percentVar[1]), "% variance"),
+       y = paste0("PC2: ", round(100 * pcaData$percentVar[2]), "% variance")) +
+  theme_minimal()
+print(p)
+# Perform PCA with grouping variable
+#PCA Clustering with grouping
+vsd <- vst(dds)
+
+# PCA plot
+plotPCA(vsd, intgroup = "Condition")
+
+# Heatmap clustering (example)
+library(pheatmap)
+topVarGenes <- head(order(rowVars(assay(vsd)), decreasing = TRUE), 500)
+pheatmap(assay(vsd)[topVarGenes, ])
+
+dev.off()
+
+#Run DESeq2
 dds <- DESeq(dds) # Run DESeq2
 #check results
 res <- results(dds)
@@ -50,6 +106,10 @@ head(res_sig)
 summary(res_sig)
 res_sig <- res[which(res$padj < 0.05), ]
 head(res_sig)
+sink("summary.txt") #save to file
+summary(res)
+summary(res_sig)
+sink()
 
 # bonferroni correction if needed/planned
 #res$padj_bonferroni <- p.adjust(res$pvalue, method = "bonferroni")
@@ -77,11 +137,11 @@ EnhancedVolcano(res,
     labSize = 3.0)
 #PCA Plot
 vsd <- vst(dds, blind = FALSE)  # or use rlog(dds) 
-plotPCA(vsd, intgroup = "condition")  # replace with your group
+plotPCA(vsd, intgroup = "Condition")  # replace with your group
 
 
 # Get top 20 significant genes and plot heatmap
-top_genes <- order(res$padj, na.last = NA)[1:20]
+top_genes <- order(res$padj, na.last = NA)[1:16]
 mat <- assay(vsd)[top_genes, ]
 mat <- mat - rowMeans(mat)
 pheatmap(mat, annotation_col = coldata_FR4all)
@@ -90,28 +150,7 @@ pheatmap(mat, annotation_col = coldata_FR4all)
 plotDispEsts(dds)
 
 # Begin saving to PDF
-pdf("Plots.pdf", width = 10, height = 8)
-plotMA(res, ylim = c(-5, 5), main = "MA Plot")
-EnhancedVolcano(res,
-    lab = rownames(res),
-    x = 'log2FoldChange',
-    y = 'padj',
-    pCutoff = 0.05,
-    FCcutoff = 1,
-    pointSize = 2.0,
-    labSize = 2.5,
-    title = 'Volcano Plot')
-plotPCA(vsd, intgroup = "Condition")
-plotDispEsts(dds, main = "Dispersion Estimates")
-top_genes <- head(order(res$padj, na.last = NA), 20)
-mat <- assay(vsd)[top_genes, ]
-mat <- mat - rowMeans(mat)
-pheatmap(mat, annotation_col = as.data.frame(colData(dds)[, "Condition", drop = FALSE]),
-         main = "Top 20 Differentially Expressed Genes")
-
-dev.off()
-# Begin saving to PDF
-pdf("Plots.pdf", width = 10, height = 8)
+pdf("Plots.pdf")
 
 ## 1. MA Plot
 plotMA(res, ylim = c(-5, 5), main = "MA Plot")
@@ -140,14 +179,14 @@ mat <- mat - rowMeans(mat)
 pheatmap(mat, annotation_col = as.data.frame(colData(dds)[, "Condition", drop = FALSE]),
          main = "Top 20 Differentially Expressed Genes")
 
+
 #save plots to PDF
-dev.off()
 
 ## 6. GSEA Analysis
 # Step 1: Remove version numbers (e.g., ".1" at the end)
-sig_genes_clean <- gsub("\\..*$", "", sig_genes)
 sig_genes <- rownames(res[which(res$padj < 0.05), ])
-entrez_ids <- mapIds(org.Hs.eg.db, keys = sig_genes, keytype = "ENSEMBL", column = "ENTREZID")
+sig_genes_clean <- gsub("\\..*$", "", sig_genes)
+entrez_ids <- mapIds(org.Hs.eg.db, keys = sig_genes_clean, keytype = "ENSEMBL", column = "ENTREZID")
 
 # Step 2: Convert to Entrez
 entrez_ids <- mapIds(org.Hs.eg.db,
@@ -162,18 +201,11 @@ go_results <- enrichGO(gene         = entrez_ids,
                        pAdjustMethod = "BH",
                        pvalueCutoff  = 0.05,
                        readable      = TRUE)
-# Step 3: KEGG
+# Step 3: KEGG # needs internet
 kegg_res <- enrichKEGG(gene         = entrez_ids,
                        organism     = "hsa",
                        pvalueCutoff = 0.05)
 # Step 4: Reactome
-reactome_res <- enrichPathway(gene = entrez_ids,
-                              organism = "human",
-                              pvalueCutoff = 0.05,
-                              readable = TRUE)
-
-
-BiocManager::install(c("ReactomePA", "DOSE"))
 reactome_res <- enrichPathway(gene = entrez_ids,
                               organism = "human",
                               pvalueCutoff = 0.05,
@@ -200,9 +232,6 @@ gsea_res <- gseGO(geneList = gene_list,
                   pvalueCutoff = 0.05,
                   verbose = FALSE)
 
-barplot(go_res, showCategory = 20, title = "GO Biological Process")
-dotplot(go_res, showCategory = 20, title = "GO BP (dotplot)")
-
 go_res <- enrichGO(gene         = entrez_ids,
                    OrgDb        = org.Hs.eg.db,
                    keyType      = "ENTREZID",
@@ -210,6 +239,8 @@ go_res <- enrichGO(gene         = entrez_ids,
                    pAdjustMethod = "BH",
                    pvalueCutoff  = 0.05,
                    readable      = TRUE)
+
+
 barplot(go_res, showCategory = 20, title = "GO Biological Process")
 dotplot(go_res, showCategory = 20, title = "GO BP (dotplot)")
 # KEGG
@@ -223,7 +254,7 @@ dotplot(reactome_res, showCategory = 20, title = "Reactome (dotplot)")
 # GSEA
 dotplot(gsea_res, showCategory = 20, title = "GSEA (GO BP)")
 ridgeplot(gsea_res, showCategory = 20)
-dev.off()
+
 # STEP 4: Export results as CSV
 write.csv(as.data.frame(go_res), "GO_results.csv")
 write.csv(as.data.frame(kegg_res), "KEGG_results.csv")
