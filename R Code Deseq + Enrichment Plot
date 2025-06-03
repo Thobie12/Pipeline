@@ -1,0 +1,694 @@
+---
+title: "Combined_Cell_Lines"
+author: "Tobi Agbede"
+date: "2025-06-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#setting directory for entire files
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/Users/tobiagbede/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined")
+```
+
+
+
+```{r}
+# install packages if not needed
+#install.packages("circlize")
+#BiocManager::install("ReactomePA")
+#install.packages("DOSE")
+#BiocManager::install("karyoploteR")  # not always needed, but for chromosome data
+#BiocManager::install("BSgenome.Hsapiens.UCSC.hg38")  # needed for hg38 ideograms
+```
+
+```{r}
+
+# code to install needed libraries
+library(ggplot2)
+library(pheatmap)
+library(apeglm)
+library(EnhancedVolcano)
+library(DESeq2)
+library(clusterProfiler)
+library(enrichplot)
+library(circlize)
+library(dplyr)
+library(readr)
+library(stringr)
+library(org.Hs.eg.db)
+library(ReactomePA)
+library(DOSE)
+library(dplyr)
+library(readr)
+library(circlize)
+library(stringr)
+library(VennDiagram)
+```
+
+
+```{r}
+# Import file and set up for deseq
+counts <- read.csv("~/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined/RSEM/2025-06-02_Combined_MM_celll_lines_gene_expression_TPM.tsv", sep = "\t", row.names = 1, header = TRUE, stringsAsFactors = TRUE, check.names = FALSE) #link for RSEM expected count data
+coldata <- read.csv("metadata.csv", header = TRUE, row.names = 1 ) #link for metadata if it exists; make as a tsv file using nanos and tab to separate entry
+nrow(coldata) # Check number of rows in coldata
+colnames(coldata) # Check column names in coldata
+geneinfo <- counts[, 1:2] # Extract gene information
+
+colnames(geneinfo)[1] <- "Symbol"
+geneinfo$Ensembl_ID <- row.names(geneinfo) # adding symbol
+colnames(geneinfo)
+
+CleanedCounts <- counts[, -(1)] # Remove gene information columns
+CleanedCounts <- round(CleanedCounts) # Round counts to integers
+
+
+all(colnames(CleanedCounts) == rownames(coldata)) # Check if column names of counts match row names of coldata; if FALSE, check the metadata file and fix
+coldata$Treatment <- as.factor(coldata$Treatment) # Convert condition to factor
+coldata$Sensitivity <- as.factor(coldata$Sensitivity) # Convert condition to factor
+coldata$CellType <- as.factor(coldata$CellType) # Convert condition to factor
+coldata$Plasmid <- as.factor(coldata$Plasmid) # Convert condition to factor
+coldata$Batch <- as.factor(coldata$Batch) # Convert condition to factor
+
+```
+
+```{r}
+#run deseq
+
+# code to view levelling
+#levels(coldata$Sensitivity)
+#levels(coldata$Plasmid)
+#levels(coldata$Treatment)
+
+#code to refactor if needed
+coldata$Sensitivity <- relevel(coldata$Sensitivity, ref = "Sensitive")
+coldata$Plasmid <- relevel(coldata$Plasmid, ref = "EV")
+
+dds <- DESeqDataSetFromMatrix(countData = CleanedCounts,
+                              colData = coldata,
+                              design = ~ CellType + Plasmid + Sensitivity + Treatment + Sensitivity*Treatment )
+
+
+dds <- DESeq(dds)
+
+resultsNames(dds)
+```
+
+```{r}
+# Define suffixes and output PDF
+suffixes <- c("Sensitivity", "CellType", "Plasmid", "Batch")
+pdf("Preplots.pdf")
+
+for (sfx in suffixes) {
+  message("\nProcessing: ", sfx)
+
+  # Step 1: Load DESeq2 object
+  dds <- get(paste0("dds_", sfx))
+
+  # Step 2: VST transformation
+  vsd <- vst(dds)
+  assign(paste0("vsd_", sfx), vsd)
+
+  # Step 3: Sample distance matrix
+  sampleDists <- dist(t(assay(vsd)))
+  sampleDistMatrix <- as.matrix(sampleDists)
+  rownames(sampleDistMatrix) <- colnames(vsd)
+  colnames(sampleDistMatrix) <- colnames(vsd)
+  assign(paste0("sampleDistMatrix_", sfx), sampleDistMatrix)
+
+  # Step 4: Heatmap
+  pheatmap(
+    sampleDistMatrix,
+    clustering_distance_rows = sampleDists,
+    clustering_distance_cols = sampleDists,
+    show_rownames = TRUE,
+    show_colnames = TRUE,
+    main = paste("Sample-to-sample distance heatmap:", sfx)
+  )
+
+  # Step 5: PCA
+  pcaData <- prcomp(t(assay(vsd)))$x
+  pcaData <- as.data.frame(pcaData)
+  pcaData$Sample <- rownames(pcaData)
+
+  # Step 6: Group metadata extraction
+  metadata <- as.data.frame(colData(vsd))
+  metadata$Sample <- rownames(metadata)
+
+  # Check if the group column exists
+  if (!(sfx %in% colnames(metadata))) {
+    stop(paste0("Column '", sfx, "' not found in metadata. Available columns: ", paste(colnames(metadata), collapse = ", ")))
+  }
+
+  # Step 7: Merge group info into PCA data
+  pcaData <- merge(pcaData, metadata[, c("Sample", sfx)], by = "Sample")
+  colnames(pcaData)[which(names(pcaData) == sfx)] <- "Group"
+
+  # Step 8: PCA plot
+  ggplot(pcaData, aes(x = PC1, y = PC2, color = Group)) +
+    geom_point(size = 3) +
+    geom_text_repel(aes(label = Sample), size = 3) +
+    labs(
+      title = paste("PCA Plot:", sfx),
+      x = "PC1",
+      y = "PC2",
+      color = sfx
+    ) +
+    theme_minimal()
+  print(last_plot())
+
+  # Step 9: Save PCA coordinates
+  write_csv(pcaData, paste0("pcaData_", sfx, ".csv"))
+}
+
+# Close PDF
+dev.off()
+```
+
+
+
+```{r}
+# Open PDF for plots
+pdf("MultiGroup_Plots_withGeneinfo.pdf")
+
+for (sfx in suffixes) {
+  message("Processing: ", sfx)
+
+  # Retrieve the DESeq2 object
+  dds <- get(paste0("dds_", sfx))
+
+  # VST transformation
+  vsd <- vst(dds)
+
+  # Replace Ensembl IDs with gene symbols from geneinfo
+  if (exists("geneinfo") &&
+      is.data.frame(geneinfo) &&
+      "Symbol" %in% colnames(geneinfo) &&
+      !is.null(nrow(geneinfo)) &&
+      !is.null(nrow(vsd)) &&
+      nrow(geneinfo) == nrow(vsd)) {
+    
+    gene_symbols <- geneinfo$Symbol
+    gene_symbols[is.na(gene_symbols) | gene_symbols == ""] <- rownames(vsd)[is.na(gene_symbols) | gene_symbols == ""]
+    rownames(vsd) <- make.unique(gene_symbols)
+  } else {
+    warning("geneinfo is missing, not a valid data frame, or row count mismatch with VSD; skipping gene symbol assignment.")
+  }
+
+  # --- PCA Plot ---
+  pcaData <- plotPCA(vsd, intgroup = sfx, returnData = TRUE)
+  percentVar <- round(100 * attr(pcaData, "percentVar"))
+
+  p <- ggplot(pcaData, aes(x = PC1, y = PC2, color = !!sym(sfx))) +
+    geom_point(size = 3) +
+    geom_text_repel(aes(label = name), size = 2.5) +
+    labs(
+      title = paste("PCA - Grouped by", sfx),
+      x = paste0("PC1: ", percentVar[1], "% variance"),
+      y = paste0("PC2: ", percentVar[2], "% variance"),
+      color = sfx
+    ) +
+    theme_minimal()
+  print(p)
+
+  # --- Heatmap ---
+  mat <- assay(vsd)
+  topVarGenes <- head(order(rowVars(mat), decreasing = TRUE), 90)
+
+  pheatmap(
+    mat[topVarGenes, ],
+    show_rownames = TRUE,
+    main = paste("Top 90 Variable Genes -", sfx),
+    clustering_distance_rows = "euclidean",
+    clustering_distance_cols = "euclidean"
+  )
+}
+
+# Close PDF
+dev.off()
+```
+
+
+```{r}
+#filtering and saving results for up and down reg gene based off deseq data
+suffixes <- c(
+  "Intercept", "CellType_EJM_vs_8226", "CellType_FR4_vs_8226", "CellType_JJN3_vs_8226", 
+  "CellType_KMS11_vs_8226", "CellType_KMS26_vs_8226", "Plasmid_None_vs_EV", 
+  "Plasmid_TP53INP1_vs_EV", "Plasmid_TP53KO_vs_EV", "Sensitivity_None_vs_Sensitive", 
+  "Sensitivity_Resistant_vs_Sensitive", "Treatment_None_vs_DMSO", "Treatment_PIK_vs_DMSO",  
+  "SensitivityNone.TreatmentNone", "SensitivityResistant.TreatmentNone", 
+  "SensitivityNone.TreatmentPIK", "SensitivityResistant.TreatmentPIK"
+)
+
+for (sfx in suffixes) {
+  cat("Processing:", sfx, "\n")
+  
+  # Get results
+  res <- results(dds, name = sfx)
+  
+  # Remove rows with NA padj
+  res <- res[!is.na(res$padj), ]
+  
+  #add gene symbol
+  
+  rownames(res) <- geneinfo$Symbol
+  
+  # Print top results ordered by padj to console for quick view
+  print(head(res[order(res$padj), ]))
+  
+  # Convert to data frame for subsetting and writing csv
+  res_df <- as.data.frame(res)
+  
+  # Filter significant upregulated genes (padj < 0.05 and log2FC > 1)
+  res_sig_OE <- subset(res_df, padj < 0.05 & log2FoldChange > 1)
+  
+  # Filter significant downregulated genes (padj < 0.05 and log2FC < -1)
+  res_sig_KD <- subset(res_df, padj < 0.05 & log2FoldChange < -1)
+  
+  # Save results only if non-empty
+  if (nrow(res_sig_OE) > 0) {
+    write.csv(res_sig_OE, paste0("sig_up_", sfx, ".csv"), row.names = TRUE)
+  } else {
+    cat("No significant upregulated genes for", sfx, "\n")
+  }
+  
+  if (nrow(res_sig_KD) > 0) {
+    write.csv(res_sig_KD, paste0("sig_down_", sfx, ".csv"), row.names = TRUE)
+  } else {
+    cat("No significant downregulated genes for", sfx, "\n")
+  }
+  
+}
+
+```
+
+```{r}
+# Save all output to one file for summary p<0.05
+sink("combined(p<0.05).txt")  # Open sink once
+
+# List of model names
+suffixes <- c(
+  "Intercept", "CellType_EJM_vs_8226", "CellType_FR4_vs_8226", "CellType_JJN3_vs_8226", 
+  "CellType_KMS11_vs_8226", "CellType_KMS26_vs_8226", "Plasmid_None_vs_EV", 
+  "Plasmid_TP53INP1_vs_EV", "Plasmid_TP53KO_vs_EV", "Sensitivity_None_vs_Sensitive", 
+  "Sensitivity_Resistant_vs_Sensitive", "Treatment_None_vs_DMSO", "Treatment_PIK_vs_DMSO",  
+  "SensitivityNone.TreatmentNone", "SensitivityResistant.TreatmentNone", 
+  "SensitivityNone.TreatmentPIK", "SensitivityResistant.TreatmentPIK"
+)
+
+# Loop through suffixes and print results
+for (sfx in suffixes) {
+  cat("=== Result for:", sfx, "===\n")  # Use cat for cleaner labels
+  res0.05 <- results(dds, alpha = 0.05, name = sfx)
+  print(summary(res0.05))
+  cat("\n\n")
+}
+
+sink()  # Close sink after the loop
+
+```
+
+
+```{r}
+#run this
+# Save all output to one file for summary p<0.1
+sink("combined(p<0.1).txt")  # Open sink once
+
+# List of model names
+suffixes <- c(
+  "Intercept", "CellType_EJM_vs_8226", "CellType_FR4_vs_8226", "CellType_JJN3_vs_8226", 
+  "CellType_KMS11_vs_8226", "CellType_KMS26_vs_8226", "Plasmid_None_vs_EV", 
+  "Plasmid_TP53INP1_vs_EV", "Plasmid_TP53KO_vs_EV", "Sensitivity_None_vs_Sensitive", 
+  "Sensitivity_Resistant_vs_Sensitive", "Treatment_None_vs_DMSO", "Treatment_PIK_vs_DMSO",  
+  "SensitivityNone.TreatmentNone", "SensitivityResistant.TreatmentNone", 
+  "SensitivityNone.TreatmentPIK", "SensitivityResistant.TreatmentPIK"
+)
+
+# Loop through suffixes and print results
+for (sfx in suffixes) {
+  cat("=== Result for:", sfx, "===\n")  # Use cat for cleaner labels
+  res0.1 <- results(dds, alpha = 0.1, name = sfx)
+  print(summary(res0.1))
+  cat("\n\n")
+}
+
+sink()  # Close sink after the loop
+```
+
+
+```{r}
+#Running GO for downreg genes
+
+setwd("~/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined/DESeq")
+
+suffixes <- c(
+ "Intercept", "CellType_EJM_vs_8226", "CellType_FR4_vs_8226", "CellType_JJN3_vs_8226", 
+  "CellType_KMS11_vs_8226", "CellType_KMS26_vs_8226", "Plasmid_None_vs_EV", 
+  "Plasmid_TP53INP1_vs_EV", "Plasmid_TP53KO_vs_EV", "Sensitivity_None_vs_Sensitive", 
+  "Sensitivity_Resistant_vs_Sensitive", "Treatment_None_vs_DMSO", "Treatment_PIK_vs_DMSO",  
+  "SensitivityNone.TreatmentNone", "SensitivityResistant.TreatmentNone", 
+  "SensitivityNone.TreatmentPIK", "SensitivityResistant.TreatmentPIK"
+)
+
+
+
+for (sfx in suffixes) {
+  cat("\n\nProcessing:", sfx, "...\n")
+
+  infile <- paste0("sig_down/sig_down_", sfx, ".csv")
+  if (!file.exists(infile)) {
+    cat("File not found:", infile, "\n")
+    next
+  }
+
+  res <- read.csv(infile, header = TRUE)
+  colnames(res)[1] <- "Ensembl_ID"
+  res <- merge(res, geneinfo[, c("Ensembl_ID", "Symbol")], by = "Ensembl_ID")
+
+  write.csv(res, paste0("sig_down", sfx, ".csv"), row.names = FALSE)
+
+  sig_genes_clean <- gsub("\\..*$", "", res$Symbol)
+  entrez_ids <- mapIds(org.Hs.eg.db, 
+                       keys = sig_genes_clean,
+                       keytype = "SYMBOL", 
+                       column = "ENTREZID", 
+                       multiVals = "first")
+
+  entrez_ids <- na.omit(entrez_ids)
+
+  if (length(entrez_ids) == 0) {
+    cat("No Entrez IDs found for:", sfx, "\n")
+    next
+  }
+
+  # GO
+  go_res <- enrichGO(gene = entrez_ids,
+                     OrgDb = org.Hs.eg.db,
+                     keyType = "ENTREZID",
+                     ont = "BP",
+                     pAdjustMethod = "BH",
+                     pvalueCutoff = 0.1,
+                     readable = TRUE)
+
+  if (!is.null(go_res) && nrow(as.data.frame(go_res)) > 0) {
+    write.csv(as.data.frame(go_res), paste0("Sig_Down_GO_results_", sfx, ".csv"))
+  } else {
+    cat("No GO terms enriched for:", sfx, "\n")
+    go_res <- NULL
+  }
+
+  # KEGG
+  kegg_res <- enrichKEGG(gene = entrez_ids,
+                         organism = "hsa",
+                         pvalueCutoff = 0.1)
+
+  if (!is.null(kegg_res) && nrow(as.data.frame(kegg_res)) > 0) {
+    write.csv(as.data.frame(kegg_res), paste0("Sig_Down_KEGG_results_", sfx, ".csv"))
+  } else {
+    cat("No KEGG pathways enriched for:", sfx, "\n")
+    kegg_res <- NULL
+  }
+
+  # Reactome
+  reactome_res <- enrichPathway(gene = entrez_ids,
+                                organism = "human",
+                                pvalueCutoff = 0.1,
+                                readable = TRUE)
+
+  if (!is.null(reactome_res) && nrow(as.data.frame(reactome_res)) > 0) {
+    write.csv(as.data.frame(reactome_res), paste0("Sig_Down_Reactome_results_", sfx, ".csv"))
+  } else {
+    cat("No Reactome pathways enriched for:", sfx, "\n")
+    reactome_res <- NULL
+  }
+
+  # GSEA
+  gene_vector <- res$log2FoldChange
+  names(gene_vector) <- res$Symbol
+  entrez_names <- mapIds(org.Hs.eg.db,
+                         keys = names(gene_vector),
+                         keytype = "SYMBOL",
+                         column = "ENTREZID",
+                         multiVals = "first")
+  entrez_names <- na.omit(entrez_names)
+
+  gene_vector <- gene_vector[names(entrez_names)]
+  names(gene_vector) <- entrez_names
+  gene_vector <- na.omit(gene_vector)
+  gene_vector <- sort(gene_vector, decreasing = TRUE)
+
+  if (length(gene_vector) > 10) {
+    gsea_res <- tryCatch({
+      gseGO(geneList = gene_vector,
+            OrgDb = org.Hs.eg.db,
+            ont = "BP",
+            keyType = "ENTREZID",
+            minGSSize = 10,
+            maxGSSize = 500,
+            pvalueCutoff = 0.1,
+            verbose = FALSE)
+    }, error = function(e) {
+      cat("GSEA error for:", sfx, "\n", e$message, "\n")
+      return(NULL)
+    })
+
+    if (!is.null(gsea_res) && nrow(as.data.frame(gsea_res)) > 0) {
+      write.csv(as.data.frame(gsea_res), paste0("Sig_Down_GSEA_results_", sfx, ".csv"))
+    } else {
+      cat("No GSEA results for:", sfx, "\n")
+      gsea_res <- NULL
+    }
+  } else {
+    cat("Not enough genes for GSEA for:", sfx, "\n")
+    gsea_res <- NULL
+  }
+# Helper functions to check valid results
+has_rows <- function(x) {
+  !is.null(x) && inherits(x, "enrichResult") && nrow(x@result) > 0
+}
+
+has_gsea_rows <- function(x) {
+  !is.null(x) && inherits(x, "gseaResult") && nrow(x@result) > 0
+}
+
+# Collect plots to print
+plot_list <- list()
+
+if (has_rows(go_res)) {
+  plot_list <- c(plot_list,
+                 list(barplot(go_res, showCategory = 20, title = "GO Biological Process"),
+                      dotplot(go_res, showCategory = 20, title = "GO BP (dotplot)")))
+}
+
+if (has_rows(kegg_res)) {
+  plot_list <- c(plot_list,
+                 list(barplot(kegg_res, showCategory = 20, title = "KEGG Pathways"),
+                      dotplot(kegg_res, showCategory = 20, title = "KEGG (dotplot)")))
+}
+
+if (has_rows(reactome_res)) {
+  plot_list <- c(plot_list,
+                 list(barplot(reactome_res, showCategory = 20, title = "Reactome Pathways"),
+                      dotplot(reactome_res, showCategory = 20, title = "Reactome (dotplot)")))
+}
+
+if (has_gsea_rows(gsea_res)) {
+  plot_list <- c(plot_list,
+                 list(dotplot(gsea_res, showCategory = 20, title = "GSEA (GO BP)"),
+                      ridgeplot(gsea_res, showCategory = 20)))
+}
+
+# Write all plots to ONE PDF file per suffix if there are plots
+if (length(plot_list) > 0) {
+  pdf(paste0("Sig_Down_Enrichment_Plots_", sfx, ".pdf"), width = 10, height = 8)
+  for (plt in plot_list) {
+    print(plt)
+  }
+  dev.off()
+} else {
+  message("⚠️ No enrichment plots to save for suffix: ", sfx)
+}
+}
+```
+```{r}
+#Running GO for upreg genes
+
+setwd("~/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined/DESeq")
+
+suffixes <- c(
+ "Intercept", "CellType_EJM_vs_8226", "CellType_FR4_vs_8226", "CellType_JJN3_vs_8226", 
+  "CellType_KMS11_vs_8226", "CellType_KMS26_vs_8226", "Plasmid_None_vs_EV", 
+  "Plasmid_TP53INP1_vs_EV", "Plasmid_TP53KO_vs_EV", "Sensitivity_None_vs_Sensitive", 
+  "Sensitivity_Resistant_vs_Sensitive", "Treatment_None_vs_DMSO", "Treatment_PIK_vs_DMSO",  
+  "SensitivityNone.TreatmentNone", "SensitivityResistant.TreatmentNone", 
+  "SensitivityNone.TreatmentPIK", "SensitivityResistant.TreatmentPIK"
+)
+
+
+
+for (sfx in suffixes) {
+  cat("\n\nProcessing:", sfx, "...\n")
+
+  infile <- paste0("sig_up/sig_up_", sfx, ".csv")
+  if (!file.exists(infile)) {
+    cat("File not found:", infile, "\n")
+    next
+  }
+
+  res <- read.csv(infile, header = TRUE)
+  colnames(res)[1] <- "Ensembl_ID"
+  res <- merge(res, geneinfo[, c("Ensembl_ID", "Symbol")], by = "Ensembl_ID")
+
+  write.csv(res, paste0("sig_up", sfx, ".csv"), row.names = FALSE)
+
+  sig_genes_clean <- gsub("\\..*$", "", res$Symbol)
+  entrez_ids <- mapIds(org.Hs.eg.db, 
+                       keys = sig_genes_clean,
+                       keytype = "SYMBOL", 
+                       column = "ENTREZID", 
+                       multiVals = "first")
+
+  entrez_ids <- na.omit(entrez_ids)
+
+  if (length(entrez_ids) == 0) {
+    cat("No Entrez IDs found for:", sfx, "\n")
+    next
+  }
+
+  # GO
+  go_res <- enrichGO(gene = entrez_ids,
+                     OrgDb = org.Hs.eg.db,
+                     keyType = "ENTREZID",
+                     ont = "BP",
+                     pAdjustMethod = "BH",
+                     pvalueCutoff = 0.1,
+                     readable = TRUE)
+
+  if (!is.null(go_res) && nrow(as.data.frame(go_res)) > 0) {
+    write.csv(as.data.frame(go_res), paste0("Sig_up_GO_results_", sfx, ".csv"))
+  } else {
+    cat("No GO terms enriched for:", sfx, "\n")
+    go_res <- NULL
+  }
+
+  # KEGG
+  kegg_res <- enrichKEGG(gene = entrez_ids,
+                         organism = "hsa",
+                         pvalueCutoff = 0.1)
+
+  if (!is.null(kegg_res) && nrow(as.data.frame(kegg_res)) > 0) {
+    write.csv(as.data.frame(kegg_res), paste0("Sig_up_KEGG_results_", sfx, ".csv"))
+  } else {
+    cat("No KEGG pathways enriched for:", sfx, "\n")
+    kegg_res <- NULL
+  }
+
+  # Reactome
+  reactome_res <- enrichPathway(gene = entrez_ids,
+                                organism = "human",
+                                pvalueCutoff = 0.1,
+                                readable = TRUE)
+
+  if (!is.null(reactome_res) && nrow(as.data.frame(reactome_res)) > 0) {
+    write.csv(as.data.frame(reactome_res), paste0("Sig_up_Reactome_results_", sfx, ".csv"))
+  } else {
+    cat("No Reactome pathways enriched for:", sfx, "\n")
+    reactome_res <- NULL
+  }
+
+  # GSEA
+  gene_vector <- res$log2FoldChange
+  names(gene_vector) <- res$Symbol
+  entrez_names <- mapIds(org.Hs.eg.db,
+                         keys = names(gene_vector),
+                         keytype = "SYMBOL",
+                         column = "ENTREZID",
+                         multiVals = "first")
+  entrez_names <- na.omit(entrez_names)
+
+  gene_vector <- gene_vector[names(entrez_names)]
+  names(gene_vector) <- entrez_names
+  gene_vector <- na.omit(gene_vector)
+  gene_vector <- sort(gene_vector, decreasing = TRUE)
+
+  if (length(gene_vector) > 10) {
+    gsea_res <- tryCatch({
+      gseGO(geneList = gene_vector,
+            OrgDb = org.Hs.eg.db,
+            ont = "BP",
+            keyType = "ENTREZID",
+            minGSSize = 10,
+            maxGSSize = 500,
+            pvalueCutoff = 0.1,
+            verbose = FALSE)
+    }, error = function(e) {
+      cat("GSEA error for:", sfx, "\n", e$message, "\n")
+      return(NULL)
+    })
+
+    if (!is.null(gsea_res) && nrow(as.data.frame(gsea_res)) > 0) {
+      write.csv(as.data.frame(gsea_res), paste0("Sig_up_GSEA_results_", sfx, ".csv"))
+    } else {
+      cat("No GSEA results for:", sfx, "\n")
+      gsea_res <- NULL
+    }
+  } else {
+    cat("Not enough genes for GSEA for:", sfx, "\n")
+    gsea_res <- NULL
+  }
+# Helper functions to check valid results
+has_rows <- function(x) {
+  !is.null(x) && inherits(x, "enrichResult") && nrow(x@result) > 0
+}
+
+has_gsea_rows <- function(x) {
+  !is.null(x) && inherits(x, "gseaResult") && nrow(x@result) > 0
+}
+
+# Collect plots to print
+plot_list <- list()
+
+if (has_rows(go_res)) {
+  plot_list <- c(plot_list,
+                 list(barplot(go_res, showCategory = 20, title = "GO Biological Process"),
+                      dotplot(go_res, showCategory = 20, title = "GO BP (dotplot)")))
+}
+
+if (has_rows(kegg_res)) {
+  plot_list <- c(plot_list,
+                 list(barplot(kegg_res, showCategory = 20, title = "KEGG Pathways"),
+                      dotplot(kegg_res, showCategory = 20, title = "KEGG (dotplot)")))
+}
+
+if (has_rows(reactome_res)) {
+  plot_list <- c(plot_list,
+                 list(barplot(reactome_res, showCategory = 20, title = "Reactome Pathways"),
+                      dotplot(reactome_res, showCategory = 20, title = "Reactome (dotplot)")))
+}
+
+if (has_gsea_rows(gsea_res)) {
+  plot_list <- c(plot_list,
+                 list(dotplot(gsea_res, showCategory = 20, title = "GSEA (GO BP)"),
+                      ridgeplot(gsea_res, showCategory = 20)))
+}
+
+# Write all plots to ONE PDF file per suffix if there are plots
+if (length(plot_list) > 0) {
+  pdf(paste0("Sig_up_Enrichment_Plots_", sfx, ".pdf"), width = 10, height = 8)
+  for (plt in plot_list) {
+    print(plt)
+  }
+  dev.off()
+} else {
+  message("⚠️ No enrichment plots to save for suffix: ", sfx)
+}
+}
+```
+
+
+
+
+
+
+
+
