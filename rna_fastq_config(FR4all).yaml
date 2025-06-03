@@ -1,9 +1,9 @@
 ---
-FR4: # use the patient ID as the key
+FR4_Plasmid: # use the patient ID as the key
   S124: # use the sample ID as the key
     type: 'normal' # use 'normal' or 'tumour' as the value
     libraries:
-      Stewart_241029_RNA: # use the library name as the key
+      FR4EV: # use the library name as the key
         runlanes:
           L005:
             fastq:
@@ -24,7 +24,7 @@ FR4: # use the patient ID as the key
   S125: # use the sample ID as the key  
     type: 'tumour' 
     libraries:
-      Stewart_241029_RNA: # use the library name as the key
+      FR4TP53INP1: # use the library name as the key
         runlanes:
           L005: 
             fastq:
@@ -42,10 +42,11 @@ FR4: # use the patient ID as the key
             fastq:
               R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_Stewart_241029_RNA/FR4TP53INP1_S125_L008_R1_001.fastq.gz"
               R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_Stewart_241029_RNA/FR4TP53INP1_S125_L008_R2_001.fastq.gz"
+FR4_sensitivity:  
   S123: # use the sample ID as the key  
     type: 'tumour' 
     libraries:
-      Stewart_241029_RNA: # use the library name as the key
+      FR4res: # use the library name as the key
         runlanes:
           L005: 
             fastq:
@@ -64,9 +65,9 @@ FR4: # use the patient ID as the key
               R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_Stewart_241029_RNA/FR4res_S123_L008_R1_001.fastq.gz"
               R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_Stewart_241029_RNA/FR4res_S123_L008_R2_001.fastq.gz"
   S122: # use the sample ID as the key  
-    type: 'tumour'
+    type: 'normal'
     libraries:
-      Stewart_241029_RNA: # use the library name as the key
+      FR4sen: # use the library name as the key
         runlanes:
           L005: 
             fastq:
@@ -84,3 +85,400 @@ FR4: # use the patient ID as the key
             fastq:
               R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_Stewart_241029_RNA/FR4sen_S122_L008_R1_001.fastq.gz"
               R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_Stewart_241029_RNA/FR4sen_S122_L008_R2_001.fastq.gz"
+FR4_treatment:  
+  S5: # use the sample ID as the key  
+    type: 'normal' 
+    libraries:
+      FR4_DMSO: # use the library name as the key
+        runlanes:
+          L001: 
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/FR4DMSO_S5_L001_R1_001.fastq.gz" 
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/FR4DMSO_S5_L001_R2_001.fastq.gz"
+          L002:
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/FR4DMSO_S5_L002_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/FR4DMSO_S5_L002_R2_001.fastq.gz"          
+  S6:
+    type: 'tumour'
+    libraries: 
+      FR4_PIK:
+        runlanes:
+          L001: 
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/FR4PIK_S6_L001_R1_001.fastq.gz" 
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/FR4PIK_S6_L001_R2_001.fastq.gz"
+          L002:
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/FR4PIK_S6_L002_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/FR4PIK_S6_L002_R2_001.fastq.gz"
+
+
+KMS26_Plasmid: # use the patient ID as the key
+  S127: # use the sample ID as the key
+    type: "tumour" # use 'normal' or 'tumour' as the value
+    libraries:
+      TP53INP1_EV: # use the library name as the key
+        runlanes:
+          L005:
+            fastq:
+              R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_EV_S127_L005_R1_001.fastq.gz"
+              R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_EV_S127_L005_R2_001.fastq.gz"
+          L006:
+            fastq:
+              R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_EV_S127_L006_R1_001.fastq.gz"
+              R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_EV_S127_L006_R2_001.fastq.gz"
+          L007:
+            fastq:
+              R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_EV_S127_L007_R1_001.fastq.gz"
+              R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_EV_S127_L007_R2_001.fastq.gz"
+          L008:
+            fastq:
+              R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_EV_S127_L008_R1_001.fastq.gz"
+              R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_EV_S127_L008_R2_001.fastq.gz"
+  S128: # use the sample ID as the key
+    type: 'tumour' # use 'normal' or 'tumour' as the value
+    libraries:
+      TP53INP1_KO: # use the library name as the key
+        runlanes:
+          L005:
+            fastq:
+              R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_KO_S128_L005_R1_001.fastq.gz"
+              R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_KO_S128_L005_R2_001.fastq.gz"
+          L006:
+            fastq:
+              R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_KO_S128_L006_R1_001.fastq.gz"
+              R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_KO_S128_L006_R2_001.fastq.gz"
+          L007:
+            fastq:
+              R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_KO_S128_L007_R1_001.fastq.gz"
+              R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_KO_S128_L007_R2_001.fastq.gz"
+          L008:
+            fastq:
+              R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_KO_S128_L008_R1_001.fastq.gz"
+              R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_TP53INP1_KO_S128_L008_R2_001.fastq.gz"
+  S126: # use the sample ID as the key
+    type: "normal" # use 'normal' or 'tumour' as the value
+    libraries:
+      WT: # use the library name as the key
+        runlanes:
+          L005:
+            fastq:
+              R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_WT_S126_L005_R2_001.fastq.gz"
+              R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_WT_S126_L005_R2_001.fastq.gz"
+          L006:
+            fastq:
+              R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_WT_S126_L006_R1_001.fastq.gz"
+              R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_WT_S126_L006_R2_001.fastq.gz"
+          L007:
+            fastq:
+              R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_WT_S126_L007_R1_001.fastq.gz"
+              R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_WT_S126_L007_R2_001.fastq.gz"
+          L008:
+            fastq:
+              R1: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_WT_S126_L008_R2_001.fastq.gz"
+              R2: "/cluster/projects/myelomagroup/Tobi_data_practice/20250131_LH00244_0248_B22VJNCLT3_RNAseq/KMS26_WT_S126_L008_R2_001.fastq.gz"
+KMS26_sensitivity:  
+  S44: # use the sample ID as the key  
+    type: 'normal' 
+    libraries:
+      KMS26sen: # use the library name as the key
+        runlanes:
+          L002:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26sen_S44_L002_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26sen_S44_L002_R2_001.fastq.gz"               
+          L003:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26sen_S44_L003_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26sen_S44_L003_R2_001.fastq.gz"               
+          L004:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26sen_S44_L004_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26sen_S44_L004_R2_001.fastq.gz"               
+          L005:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26sen_S44_L005_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26sen_S44_L005_R2_001.fastq.gz"                
+          L006:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26sen_S44_L006_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26sen_S44_L006_R2_001.fastq.gz"                
+          L007:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26sen_S44_L007_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26sen_S44_L007_R2_001.fastq.gz"                
+          L008:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26sen_S44_L008_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26sen_S44_L008_R2_001.fastq.gz"                
+  S45: # use the sample ID as the key  
+    type: 'tumour' 
+    libraries:
+      KMS26res: # use the library name as the key
+        runlanes:
+          L002:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26res_S45_L002_R1_001.fastq.gz
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26res_S45_L002_R2_001.fastq.gz                
+          L003:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26res_S45_L003_R1_001.fastq.gz
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26res_S45_L003_R2_001.fastq.gz                
+          L004:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26res_S45_L004_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26res_S45_L004_R2_001.fastq.gz"               
+          L005:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26res_S45_L005_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26res_S45_L005_R2_001.fastq.gz"                
+          L006:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26res_S45_L006_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26res_S45_L006_R2_001.fastq.gz"                
+          L007:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26res_S45_L007_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26res_S45_L007_R2_001.fastq.gz"                
+          L008:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26res_S45_L008_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240202_RNA/KMS26res_S45_L008_R2_001.fastq.gz"                
+KMS26_treatment: 
+  S3: # use the sample ID as the key  
+    type: 'normal' 
+    libraries:
+        KMS26_DMSO: # use the library name as the key
+        runlanes:
+          L001: 
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS26DMSO_S3_L001_R1_001.fastq.gz" 
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS26DMSO_S3_L001_R2_001.fastq.gz"
+          L002:
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS26DMSO_S3_L002_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS26DMSO_S3_L002_R2_001.fastq.gz"          
+  S4:
+    type: 'tumour'
+    libraries: 
+      KMS26_PIK:
+        runlanes:
+          L001: 
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS26PIK_S4_L001_R1_001.fastq.gz" 
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS26PIK_S4_L001_R2_001.fastq.gz"
+          L002:
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS26PIK_S4_L002_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS26PIK_S4_L002_R2_001.fastq.gz"
+KMS26_res_treatment:
+  S50:
+    type: 'normal'
+    libraries:
+      KMS26_res_DMSO:
+        runlanes:
+          L002:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resDMSO_S50_L002_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resDMSO_S50_L002_R2_001.fastq.gz"
+          L003:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resDMSO_S50_L003_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resDMSO_S50_L003_R2_001.fastq.gz"
+          L004:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resDMSO_S50_L004_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resDMSO_S50_L004_R2_001.fastq.gz"
+          L005:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resDMSO_S50_L005_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resDMSO_S50_L005_R2_001.fastq.gz"
+          L006:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resDMSO_S50_L006_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resDMSO_S50_L006_R2_001.fastq.gz"
+          L007:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resDMSO_S50_L007_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resDMSO_S50_L007_R2_001.fastq.gz"
+          L008:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resDMSO_S50_L008_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resDMSO_S50_L008_R2_001.fastq.gz"
+  S51:
+    type: 'tumour'
+    libraries:
+      KMS26_res_PIK:
+        runlanes:
+          L002:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resPIK_S51_L002_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resPIK_S51_L002_R2_001.fastq.gz"
+          L003:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resPIK_S51_L003_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resPIK_S51_L003_R2_001.fastq.gz"
+          L004:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resPIK_S51_L004_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resPIK_S51_L004_R2_001.fastq.gz"
+          L005:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resPIK_S51_L005_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resPIK_S51_L005_R2_001.fastq.gz"
+          L006:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resPIK_S51_L006_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resPIK_S51_L006_R2_001.fastq.gz"
+          L007:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resPIK_S51_L007_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resPIK_S51_L007_R2_001.fastq.gz"
+          L008:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resPIK_S51_L008_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS26resPIK_S51_L008_R2_001.fastq.gz" 
+
+KMS11_sensitivity:
+  S121: # use the sample ID as the key  
+    type: 'normal' 
+    libraries:
+      KMS11sen: # use the library name as the key
+        runlanes:
+          L001:
+            fastq:
+              R1: "/cluster/projects/pughlab/myeloma/external_data/230504_A00827_0793_BHTY2LDSX5_Stewart_230111/SK-2_S121_L001_R1_001.fastq.gz"
+              R2: "/cluster/projects/pughlab/myeloma/external_data/230504_A00827_0793_BHTY2LDSX5_Stewart_230111/SK-2_S121_L001_R2_001.fastq.gz"     
+  S124: # use the sample ID as the key  
+    type: 'tumour' 
+    libraries:
+      KMS11res: # use the library name as the key
+        runlanes:
+          L001:
+            fastq:
+              R1: "/cluster/projects/pughlab/myeloma/external_data/230504_A00827_0793_BHTY2LDSX5_Stewart_230111/SK-2_S124_L001_R1_001.fastq.gz"
+              R2: "/cluster/projects/pughlab/myeloma/external_data/230504_A00827_0793_BHTY2LDSX5_Stewart_230111/SK-2_S124_L001_R2_001.fastq.gz"          
+KMS11_res_treatment:
+  S48:
+    type: 'normal'
+    libraries:
+      KMS11_res_DMSO:
+        runlanes:
+          L002:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resDMSO_S48_L002_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resDMSO_S48_L002_R2_001.fastq.gz"
+          L003:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resDMSO_S48_L003_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resDMSO_S48_L003_R2_001.fastq.gz"
+          L004:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resDMSO_S48_L004_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resDMSO_S48_L004_R2_001.fastq.gz"
+          L005:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resDMSO_S48_L005_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resDMSO_S48_L005_R2_001.fastq.gz"
+          L006:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resDMSO_S48_L006_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resDMSO_S48_L006_R2_001.fastq.gz"
+          L007:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resDMSO_S48_L007_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resDMSO_S48_L007_R2_001.fastq.gz"
+          L008:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resDMSO_S48_L008_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resDMSO_S48_L008_R2_001.fastq.gz"
+  S49:
+    type: 'tumour'
+    libraries:
+      KMS11_res_PIK:
+        runlanes:
+          L002:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resPIK_S49_L002_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resPIK_S49_L002_R2_001.fastq.gz"
+          L003:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resPIK_S49_L003_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resPIK_S49_L003_R2_001.fastq.gz"
+          L004:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resPIK_S49_L004_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resPIK_S49_L004_R2_001.fastq.gz"
+          L005:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resPIK_S49_L005_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resPIK_S49_L005_R2_001.fastq.gz"
+          L006:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resPIK_S49_L006_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resPIK_S49_L006_R2_001.fastq.gz"
+          L007:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resPIK_S49_L007_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resPIK_S49_L007_R2_001.fastq.gz"
+          L008:
+            fastq:
+              R1: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resPIK_S49_L008_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/20240308_LH00244_0069_A22HF53LT3_Stewart/Stewart_240220/KMS11resPIK_S49_L008_R2_001.fastq.gz"
+KMS11_sen_treatment:
+  S1:
+    type: 'normal'
+    libraries:
+      KMS11senDMSO:
+        runlanes:
+          L001:
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS11senDMSO_S1_L001_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS11senDMSO_S1_L001_R2_001.fastq.gz"
+          L002:
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS11senDMSO_S1_L002_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS11senDMSO_S1_L002_R2_001.fastq.gz"
+  S2:
+    type: 'tumour'
+    libraries:
+      KMS11senPIK:
+        runlanes:
+          L001:
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS11senPIK_S2_L001_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS11senPIK_S2_L001_R2_001.fastq.gz"
+          L002:
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS11senPIK_S2_L002_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/KMS11senPIK_S2_L002_R2_001.fastq.gz"
+
+
+JJN3_treatment:
+  S11:
+    type: 'normal'
+    libraries:
+      JJN3_DMSO:
+        runlanes:
+          L001:
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/JJN3DMSO_S11_L001_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/JJN3DMSO_S11_L001_R2_001.fastq.gz"
+          L002:
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/JJN3DMSO_S11_L002_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/JJN3DMSO_S11_L002_R2_001.fastq.gz"
+  S12:
+    type: 'tumour'
+    libraries:
+      JJN3_PIK:
+        runlanes:
+          L001:
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/JJN3PIK_S12_L001_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/JJN3PIK_S12_L001_R2_001.fastq.gz"
+          L002:
+            fastq:
+              R1: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/JJN3PIK_S12_L002_R1_001.fastq.gz"
+              R2: "/cluster/projects/stewartlab/240214_A00827_0924_AH227WDRX5_Stewart_231127/JJN3PIK_S12_L002_R2_001.fastq.gz"
