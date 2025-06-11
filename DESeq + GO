@@ -1,0 +1,260 @@
+#setting directory for entire files
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/Users/tobiagbede/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined")
+
+#install needed libraries
+library(ggplot2)
+library(pheatmap)
+library(apeglm)
+library(EnhancedVolcano)
+library(DESeq2)
+library(clusterProfiler)
+library(enrichplot)
+library(circlize)
+library(dplyr)
+library(readr)
+library(stringr)
+library(org.Hs.eg.db)
+library(ReactomePA)
+library(DOSE)
+library(dplyr)
+library(readr)
+library(circlize)
+library(stringr)
+library(VennDiagram)
+library(devtools)
+library(clusterProfiler)
+library(GOplot)
+
+
+# Import file and set up for deseq
+counts <- read.csv("~/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined/RSEM/2025-06-02_Combined_MM_celll_lines_gene_expression_TPM.tsv", sep = "\t", row.names = 1, header = TRUE, stringsAsFactors = TRUE, check.names = FALSE) #link for RSEM expected count data
+coldata <- read.csv("metadata.csv", header = TRUE, row.names = 1 ) #link for metadata if it exists; make as a tsv file using nanos and tab to separate entry
+nrow(coldata) # Check number of rows in coldata
+colnames(coldata) # Check column names in coldata
+geneinfo <- counts[, 1:2] # Extract gene information
+
+colnames(geneinfo)[1] <- "Symbol"
+geneinfo$Ensembl_ID <- row.names(geneinfo) # adding symbol
+colnames(geneinfo)
+
+CleanedCounts <- counts[, -(1)] # Remove gene information columns
+CleanedCounts <- round(CleanedCounts) # Round counts to integers
+
+
+all(colnames(CleanedCounts) == rownames(coldata)) # Check if column names of counts match row names of coldata; if FALSE, check the metadata file and fix
+coldata$Treatment <- as.factor(coldata$Treatment) # Convert condition to factor
+coldata$Sensitivity <- as.factor(coldata$Sensitivity) # Convert condition to factor
+coldata$CellType <- as.factor(coldata$CellType) # Convert condition to factor
+coldata$Plasmid <- as.factor(coldata$Plasmid) # Convert condition to factor
+coldata$Batch <- as.factor(coldata$Batch) # Convert condition to factor
+
+
+#run deseq
+
+# code to view levelling
+levels(coldata$Sensitivity)
+levels(coldata$Plasmid)
+levels(coldata$Treatment)
+
+#code to refactor if needed
+coldata$Sensitivity <- relevel(coldata$Sensitivity, ref = "Resistant")
+coldata$Plasmid <- relevel(coldata$Plasmid, ref = "TP53KO")
+
+dds <- DESeqDataSetFromMatrix(countData = CleanedCounts,
+                              colData = coldata,
+                              design = ~ CellType + Plasmid + Sensitivity + Treatment + Sensitivity*Treatment )
+
+
+dds <- DESeq(dds)
+
+resultsNames(dds)
+
+#GOheatfix for y axis plot - used to define function for plotting heatmap with y axis labels
+
+GOHeat_fix_y <- function (data, nlfc, fill.col) 
+{
+  x <- y <- z <- NULL
+  if (missing(nlfc)) 
+    nlfc <- 0
+  else nlfc <- nlfc
+  if (missing(fill.col)) 
+    fill.col <- c("firebrick", "white", "dodgerblue")
+  else fill.col <- fill.col
+  distance <- dist(data)
+  cluster <- hclust(distance)
+  M <- dim(data)[2]
+  nterm <- M - nlfc
+  if (nlfc == 0) {
+    s <- rowSums(data[, 1:nterm])
+    tmp <- NULL
+    for (r in 1:nrow(data)) {
+      tmp <- c(tmp, as.numeric(gsub(1, s[r], data[r, 1:nterm])))
+    }
+  }
+  else {
+    tmp <- NULL
+    for (r in 1:nrow(data)) {
+      tmp <- c(tmp, as.numeric(gsub(1, data[r, (nterm + 
+                                                  1)], data[r, 1:nterm])))
+    }
+  }
+  df <- data.frame(x = factor(rep(cluster$order, each = nterm)), y = rep(colnames(data[, 
+                                                                               1:nterm]), length(rownames(data))), z = tmp, lab = rep(rownames(data), 
+                                                                                                                                      each = nterm))
+  df_o <- df[order(df$x), ]
+  g <- ggplot() +
+   geom_tile(data = df_o, aes(x = y, y = x, fill = z)) +
+    scale_y_discrete(breaks = 1:length(unique(df_o$x)), labels = unique(df_o$lab)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(), 
+          axis.text.y = element_text(size = 14),
+          panel.background = element_blank(), 
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    coord_fixed()
+  if (nlfc == 0) {
+    g + scale_fill_gradient2("Count", space = "Lab", low = fill.col[2], 
+                             mid = fill.col[3], high = fill.col[1])
+  }
+  else {
+    g + scale_fill_gradient2("logFC", space = "Lab", low = fill.col[3], 
+                             mid = fill.col[2], high = fill.col[1])
+  }
+}
+```
+
+#Go heat fix x - used to define function for plotting heatmap with x axis labels
+GOHeat_fix_x <- function (data, nlfc, fill.col) 
+{
+  x <- y <- z <- NULL
+  if (missing(nlfc)) 
+    nlfc <- 0
+  else nlfc <- nlfc
+  if (missing(fill.col)) 
+    fill.col <- c("firebrick", "white", "dodgerblue")
+  else fill.col <- fill.col
+  distance <- dist(data)
+  cluster <- hclust(distance)
+  M <- dim(data)[2]
+  nterm <- M - nlfc
+  if (nlfc == 0) {
+    s <- rowSums(data[, 1:nterm])
+    tmp <- NULL
+    for (r in 1:nrow(data)) {
+      tmp <- c(tmp, as.numeric(gsub(1, s[r], data[r, 1:nterm])))
+    }
+  }
+  else {
+    tmp <- NULL
+    for (r in 1:nrow(data)) {
+      tmp <- c(tmp, as.numeric(gsub(1, data[r, (nterm + 
+                                                  1)], data[r, 1:nterm])))
+    }
+  }
+  df <- data.frame(x = factor(rep(cluster$order, each = nterm)), y = rep(colnames(data[, 
+                                                                               1:nterm]), length(rownames(data))), z = tmp, lab = rep(rownames(data), 
+                                                                                                                                      each = nterm))
+  df_o <- df[order(df$x), ]
+  g <- ggplot() +
+    geom_tile(data = df_o, aes(x = x, y = y, fill = z)) +
+    scale_x_discrete(breaks = 1:length(unique(df_o$x)), labels = unique(df_o$lab)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+          axis.title.x = element_blank(),
+          axis.title.y = element_blank(), 
+          axis.text.y = element_text(size = 14),
+          panel.background = element_blank(), 
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank()) +
+    coord_fixed()
+  if (nlfc == 0) {
+    g + scale_fill_gradient2("Count", space = "Lab", low = fill.col[2], 
+                             mid = fill.col[3], high = fill.col[1])
+  }
+  else {
+    g + scale_fill_gradient2("logFC", space = "Lab", low = fill.col[3], 
+                             mid = fill.col[2], high = fill.col[1])
+  }
+}
+
+
+
+#setwd - within chunk
+
+setwd("~/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined/DESeq/GOPlots/0.01")
+
+suffixes <- c("Plasmid_TP53INP1_vs_TP53KO") # include other results from DESeq result names if needed
+
+for (sfx in suffixes)
+  {
+#Defining deseq to analyze and combine w genes
+OE <- results(dds, name =sfx)
+OE <- as.data.frame(OE)
+OE$Ensembl_ID <- row.names(OE)
+OE_gene <- merge(OE, geneinfo, by= "Ensembl_ID")
+OE_gene <- OE_gene[,-c(9) ]
+OE_gene_0.1 <- OE_gene[!is.na(OE_gene$padj) & OE_gene$padj<0.05, ] #remember to modify p value as needd
+gene <- OE_gene_0.1$Symbol
+
+# Step 1: Define genes and convert
+#gene.df <- bitr(gene, fromType = "SYMBOL", toType = "ENTREZID", OrgDb = org.Hs.eg.db)
+
+# Step 2: Run enrichment analysis (ontology = ALL)
+go_res <- enrichGO(
+  gene = gene,
+  OrgDb = org.Hs.eg.db,
+  keyType = "SYMBOL",
+  ont = "ALL",
+  pvalueCutoff = 0.1, #rem to modify p value as needed
+  pAdjustMethod = "BH",
+  qvalueCutoff = 0.2,
+  minGSSize = 10,
+  maxGSSize = 500,
+  readable = TRUE,
+  pool = TRUE
+)
+
+# Step 3: Convert enrichResult to data.frame
+ego_df <- as.data.frame(go_res)
+
+# Step 4: Prepare 'terms' data frame
+terms <- data.frame(
+  Category = ego_df$ONTOLOGY,  # Use actual ontology types: BP, MF, CC
+  ID = ego_df$ID,
+  Term = ego_df$Description,
+  Genes = gsub("/", ", ", ego_df$geneID),  # Convert delimiter
+  adj_pval = ego_df$p.adjust
+)
+
+# Step 5: Prepare gene expression data (logFC)
+#gene_list <- ego_df$geneID
+gene_list <- unique(unlist(strsplit(ego_df$geneID, "/")))
+Symbol <- as.data.frame(gene_list)
+Symbol$Symbol <- Symbol[, 1]
+genes_df <- merge(Symbol,OE_gene_0.1, by = "Symbol")
+
+genes_df <- data.frame(
+  ID = gene_list,
+  logFC = genes_df$log2FoldChange
+)
+
+
+# Step 6: Create circle_dat object and chord
+circ <- circle_dat(terms, genes_df)
+process <- ego_df$Description
+chord <-chord_dat(circ, genes_df, process)
+write.csv(circ, (paste0("circ_",sfx, ".csv")))
+
+# Step 7: Plot bubble, bar and circle chart
+
+pdf(file = paste0(sfx, "_GOPlots.pdf"), paper = "special", width = 20, height = 20)
+
+#print(GOBar(circ, display = 'multiple', zsc.col = c('yellow', 'black', 'cyan')))
+print(GOBubble(circ, table.col = TRUE, labels = 1, display = "multiple"))
+print(GOHeat_fix_x(chord, nlfc = 1, fill.col = c('blue', 'white', 'red')))
+print(GOHeat_fix_y(chord, nlfc = 1, fill.col = c('blue', 'white', 'red')))
+#print(GOCircle(circ))
+
+dev.off()
+}
