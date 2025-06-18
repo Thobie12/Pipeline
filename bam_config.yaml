@@ -1,0 +1,33 @@
+---
+CA-07:
+  tumour:
+    SAMPLE_ID: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-07-01-P.cram
+    SAMPLE_INDEX: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-07-01-P.cram.crai
+CA-08:
+  tumour:
+    SAMPLE_ID: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-08-01-P.cram
+    SAMPLE_INDEX: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-08-01-P.cram.crai
+FZ-08:
+  tumour:
+    SAMPLE_ID: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4FZ-08-01-P.cram
+    SAMPLE_INDEX: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4FZ-08-01-P.cram.crai
+FZ-09:
+  tumour:
+    SAMPLE_ID: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4FZ-09-01-P.cram
+    SAMPLE_INDEX: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4FZ-09-01-P.cram.crai
+HP-01:
+  tumour:
+    SAMPLE_ID: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4HP-01-01-P.cram
+    SAMPLE_INDEX: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4HP-01-01-P.cram.crai
+HP-05:
+  tumour:
+    SAMPLE_ID: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4HP-05-01-P.cram
+    SAMPLE_INDEX: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4HP-05-01-P.cram.crai
+RE-01:
+  tumour:
+    SAMPLE_ID: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4RE-01-01-P.cram
+    SAMPLE_INDEX: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4RE-01-01-P.cram.crai
+VA-09:
+  tumour:
+    SAMPLE_ID: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4VA-09-01-P.cram
+    SAMPLE_INDEX: /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4VA-09-01-P.cram.crai
