@@ -1,0 +1,33 @@
+
+---
+
+module load perl/5.40.0 # changed versio from 5.30.0
+module load fastqc/0.11.5
+module load bwa/0.7.15
+module load samtools/1.20 # changed version from 1.9
+module load picard/2.6.0
+module load sambamba/0.7.0
+module load bedtools/2.27.1
+module load gatk/3.8
+module load gatk-cnv/4.1.8.1
+module load vcftools/0.1.15
+module load mutect/1.1.5
+module load bam-somaticsniper/1.0.5.0
+module load vardict/1.7.0
+module load varscan/2.4.2
+module load python2/2.7.15 
+module load strelka/2.9.10
+module load manta/1.6.0
+module load delly/0.8.1
+module load novoBreak/1.1 #changed to capital letter
+module load ichor-cna/0.3.2 #cqant find this
+module load ascat/4.1.0 #cant find this 
+module load panelcnmops/1.14.0
+module load pindel/0.2.5b8
+module load mavis/2.2.5
+module load cpsr/0.6.1
+module load pcgr/0.9.1
+module load vcf2maf/1.6.17
+module load msisensor-pro/1.2.0
+module load R/4.1.0
+module load mutsigcv/1.4
