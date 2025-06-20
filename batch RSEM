@@ -1,0 +1,13 @@
+#!/bin/bash
+#SBATCH --job-name="combine_and_format_results"
+#SBATCH -D /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/Combined/Slurm
+#SBATCH -t 08:00:00
+#SBATCH --mem 8G
+#SBATCH -c 1
+#SBATCH -A pughlab
+
+set -e
+
+module load R/3.6.1
+
+Rscript /cluster/projects/pughlab/bin/pughlab-pipeline-suite/pipeline-suite_v0.8.0/scripts/collect_rsem_output.R -d /cluster/home/t922316uhn/RSEM/Combined_Cell_Lines -p Combined_MM_celll_lines -g /cluster/projects/pughlab/references/gencode/GRCh38/gencode.v31.annotation.gtf
