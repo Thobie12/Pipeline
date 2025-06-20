@@ -258,3 +258,161 @@ print(GOHeat_fix_y(chord, nlfc = 1, fill.col = c('blue', 'white', 'red')))
 
 dev.off()
 }
+
+#Heatmap plotting for anything - in this case for genes of interest
+# Genes of interest
+genes_of_interest <- c("LPXN", "CYB561", "CLU", "MGAT3", "DPP7", "LAPTM5")
+
+# Set working directory
+setwd("~/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined/DESeq/GOPlots")
+
+# List of suffixes for filenames
+suffixes <- c("circ_Plasmid_None_vs_EV", "circ_Plasmid_TP53KO_vs_EV", "circ_Plasmid_TP53INP1_vs_EV",
+              "circ_SensitivityNone.TreatmentDMSO", "circ_SensitivityNone.TreatmentNone",
+              "circ_SensitivityNone.TreatmentPIK", "circ_SensitivitySensitive.TreatmentNone",
+              "circ_SensitivityResistant.TreatmentNone",
+              "circ_SensitivityResistant.TreatmentPIK", "circ_Treatment_None_vs_PIK",
+              "~/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined/DESeq/GOPlots/0.01/circ_Plasmid_TP53INP1_vs_TP53KO",
+              "~/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined/DESeq/GOPlots/0.01/circ_Sensitivity_None_vs_Resistant",
+              "~/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined/DESeq/GOPlots/0.01/circ_Sensitivity_Resistant_vs_Sensitive",
+              "~/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined/DESeq/GOPlots/0.01/circ_Sensitivity_None_vs_Sensitive",
+              "~/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined/DESeq/GOPlots/0.01/circ_SensitivitySensitive.TreatmentPIK",
+              "~/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined/DESeq/GOPlots/0.01/circ_Treatment_None_vs_DMSO",
+              "~/Desktop/Bioinf/MM_Practice/Cell_Drugs/Combined/DESeq/GOPlots/0.01/circ_Treatment_PIK_vs_DMSO"
+              )
+
+# Initialize data frame with genes of interest
+lfc_merged <- data.frame(genes = genes_of_interest)
+
+# Loop and merge
+for (sfx in suffixes) {
+  file_path <- paste0(sfx, ".csv")
+  df <- read.csv(file_path)
+
+  # Subset only genes of interest and ensure uniqueness
+  df_sub <- df[df$genes %in% genes_of_interest, c("genes", "logFC")]
+  df_sub <- df_sub[!duplicated(df_sub$genes), ]  # Keep only first occurrence of each gene
+
+  # Rename the logFC column
+  colnames(df_sub)[2] <- sfx
+
+  # Merge with master list
+  lfc_merged <- merge(lfc_merged, df_sub, by = "genes", all.x = TRUE)
+}
+
+# View result
+print(lfc_merged)
+
+rownames(lfc_merged)
+colnames(lfc_merged) <- c("genes", "Plasmid_None_vs_EV", "Plasmid_TP53KO_vs_EV", "Plasmid_TP53INP1_vs_EV",
+              "SensitivityNone.TreatmentDMSO", "SensitivityNone.TreatmentNone",
+              "SensitivityNone.TreatmentPIK", "SensitivitySensitive.TreatmentNone",
+              "SensitivityResistant.TreatmentNone",
+              "SensitivityResistant.TreatmentPIK", "Treatment_None_vs_PIK", "Plasmid_TP53INP1_vs_TP53KO", "Sensitivity_None_vs_Resistant", "Sensitivity_None_vs_Sensitive", "Sensitivity_Resistant_vs_Sensitive", "SensitivitySensitive.TreatmentPIK", "Treatment_None_vs_DMSO", "Treatment_PIK_vs_DMSO")
+
+
+#creating master file
+lfc_merged <- as.data.frame(lfc_merged)
+lfc_merged[is.na(lfc_merged)] <- 0
+
+#lfc_merged1 <- lfc_merged[, -c(5,7,8,11,13)]
+
+library(ComplexHeatmap)
+library(circlize)
+
+# Set gene names as row names
+rownames(lfc_merged) <- lfc_merged$genes
+rownames(lfc_merged1) <- lfc_merged$genes
+# Remove the 'genes' column since it's now row names
+lfc_matrix <- as.matrix(lfc_merged[ , -1])
+lfc_matrix1 <- as.matrix(lfc_merged1[ , -1])
+
+# Optional: Scale the values row-wise (if needed for normalization)
+#lfc_matrix2 <- t(scale(t(lfc_matrix1)))
+
+colnames(lfc_matrix)
+
+# Define color mapping
+col_fun <- colorRamp2(c(20, 0, -20), c("blue", "white", "red"))  # You can adjust range
+
+column_order <- c("SensitivitySensitive.TreatmentPIK", "SensitivityResistant.TreatmentPIK", "SensitivitySensitive.TreatmentNone", "SensitivityResistant.TreatmentNone", "SensitivityNone.TreatmentDMSO", "SensitivityNone.TreatmentPIK",       "SensitivityNone.TreatmentNone", "Sensitivity_None_vs_Resistant", "Sensitivity_None_vs_Sensitive", "Sensitivity_Resistant_vs_Sensitive", "Treatment_PIK_vs_DMSO", "Treatment_None_vs_PIK", "Treatment_None_vs_DMSO", "Plasmid_None_vs_EV",  "Plasmid_TP53KO_vs_EV", "Plasmid_TP53INP1_vs_EV", "Plasmid_TP53INP1_vs_TP53KO" )
+
+column_order2 <- c("SensitivitySensitive.TreatmentPIK", "SensitivityResistant.TreatmentPIK", "SensitivityResistant.TreatmentNone", "SensitivityNone.TreatmentNone","Sensitivity_None_vs_Sensitive", "Sensitivity_Resistant_vs_Sensitive", "Treatment_PIK_vs_DMSO", "Treatment_None_vs_DMSO", "Plasmid_None_vs_EV",  "Plasmid_TP53KO_vs_EV", "Plasmid_TP53INP1_vs_EV", "Plasmid_TP53INP1_vs_TP53KO" )
+
+
+col_order <- c(
+  "Plasmid_None_vs_EV", 
+  "Plasmid_TP53KO_vs_EV", 
+  "Plasmid_TP53INP1_vs_EV", 
+  "Plasmid_TP53INP1_vs_TP53KO",
+  
+  "SensitivityNone.TreatmentNone",
+  "SensitivityResistant.TreatmentNone",
+  
+  "SensitivitySensitive.TreatmentPIK",
+  "SensitivityResistant.TreatmentPIK",
+  
+  "Sensitivity_None_vs_Sensitive",
+  "Sensitivity_Resistant_vs_Sensitive",
+  
+  "Treatment_None_vs_DMSO",
+  "Treatment_PIK_vs_DMSO"
+)
+
+
+col_order2 <- c(
+  "Plasmid_None_vs_EV", 
+  "Plasmid_TP53KO_vs_EV", 
+  "Plasmid_TP53INP1_vs_EV", 
+  "Plasmid_TP53INP1_vs_TP53KO",
+  
+  "SensitivityNone.TreatmentNone",
+  "SensitivitySensitive.TreatmentNone",
+  "SensitivityResistant.TreatmentNone",
+  "SensitivityNone.TreatmentDMSO",
+  
+  "SensitivityNone.TreatmentPIK",
+  "SensitivitySensitive.TreatmentPIK",
+  "SensitivityResistant.TreatmentPIK",
+  
+  "Sensitivity_None_vs_Sensitive",
+  "Sensitivity_None_vs_Resistant",
+  "Sensitivity_Resistant_vs_Sensitive",
+  
+  "Treatment_None_vs_DMSO",
+  "Treatment_None_vs_PIK",
+  "Treatment_PIK_vs_DMSO"
+)
+
+row_order <- c("CYB561", "LAPTM5", "CLU", "DPP7", "LPXN", "MGAT3")
+row.names(lfc_matrix)
+
+
+# Create heatmap
+Heatmap(
+  lfc_matrix,
+  name = "logFC",
+  col = col_fun,
+  row_order = row_order,
+  column_order = column_order,
+  show_row_names = TRUE,
+  show_column_names = TRUE,
+  row_names_gp = gpar(fontsize = 10),
+  column_names_gp = gpar(fontsize = 10),
+  heatmap_legend_param = list(title = "log2 Fold Change")
+)
+
+
+#create heatmap 2
+Heatmap(
+  lfc_matrix1,
+  name = "logFC",
+  col = col_fun,
+  row_order = row_order,
+  column_order = column_order2,
+  show_row_names = TRUE,
+  show_column_names = TRUE,
+  row_names_gp = gpar(fontsize = 10),
+  column_names_gp = gpar(fontsize = 10),
+  heatmap_legend_param = list(title = "log2 Fold Change")
+)            
