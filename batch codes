@@ -7,11 +7,9 @@ find -type f -name "slurm-1968539.out" #code to find a specific doc within a dir
 whereis "file" # find where a file is located
 scontrol show job JOBID # info about a job - replace JOBID with the actual job id
 squeue -u username # Check the status of jobs in the queue for a specific user
-salloc -c 1 -p short -t 1:0:0 --mem 1G # request a short job if needed, remove -p if not a short session
+salloc -c 1 -p short -t 10:0:0 --mem 1G # request a short job if needed, remove -p if not a short session
 free -h # Check memory usage
 sacct --job JOBID # Check the status of a completed job
 #things to change, perl version, lik to VCF2MAF, VEP Version
 sinfo -o "%20P %10a %10l %10c %10m %10e %10D %N" #check memory on nodes
-
-
-
+squeue
