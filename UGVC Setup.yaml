@@ -1,0 +1,17 @@
+#Building UltimaVC
+
+mkdir UltimaVC
+git clone https://github.com/Ultimagen/VariantCalling
+#run the following commands from VariantCalling directory
+git clone https://github.com/Ultimagen/ugbio-utils
+mv ugbio-utils ugbio_utils #rename to avoid issues with the name
+module load python3 #load python 3 to access conda
+conda env create -f setup/environment.yml
+conda env create -f setup/other_envs/ucsc.yml
+conda env create -f setup/other_envs/cutadaptenv.yml
+conda env create -f setup/other_envs/cnmops.yml
+conda activate genomics.py3
+# if not activating; then followin instructions from terminal to add to shell and restart by pressing ctrl + D; then run again
+pip install .
+
+
