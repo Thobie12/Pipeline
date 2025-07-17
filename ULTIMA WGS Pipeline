@@ -1,0 +1,151 @@
+Pipeline for variant_calling
+
+#Sample lists
+/cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-07-01-P.cram
+/cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-08-01-P.cram
+/cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-08-R-P.cram
+/cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4FZ-08-01-P.cram
+/cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4FZ-09-01-P.cram
+/cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4HP-01-01-P.cram
+/cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4HP-05-01-P.cram
+/cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4RE-01-01-P.cram
+/cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4VA-09-01-P.cram
+
+
+#Extract fastq if needed
+samtools fastq /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-07-01-P.cram > OICRM4CA-07-01-P.fastq
+
+#mark duplicates
+#samtools view -b -T ref.fa /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-07-01-P.cram > OICRM4CA-07-01-P.bam
+#sorting the cram files - need 18cpu + 70 mem
+
+
+samtools sort -T /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Dedup/temp \
+  -o /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Dedup/OICRM4CA-07-01-P.sorted.cram \
+  -O CRAM \
+  -@ 8 \  
+  # dont change threads and mem
+  -m 2G \
+  --reference /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/WholeGenomeFasta/Homo_sapiens_assembly38.fasta \
+  /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-07-01-P.cram
+
+---
+
+samtools index \
+  -o /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Dedup/OICRM4CA-07-01-P.sorted.cram.crai \
+  /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Dedup/OICRM4CA-07-01-P.sorted.cram
+
+-------
+
+
+gatk MarkDuplicates \ # run this for about 7 days 
+    -I /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Dedup/OICRM4CA-07-01-P.sorted.cram \
+    -O /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Dedup/OICRM4CA-07-01-P.sorted.dedup.cram \
+    -M /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Dedup/OICRM4CA-07-01-P.metrics.txt \
+    --CREATE_INDEX true \
+    --CREATE_CRAM_INDEX true \
+    --VALIDATION_STRINGENCY LENIENT \
+    --REFERENCE /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/WholeGenomeFasta/Homo_sapiens_assembly38.fasta \
+    --TMP_DIR /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Dedup/tmp
+
+
+----
+#MarkDuplicatesspark
+gatk MarkDuplicatesSpark \
+    -I /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Dedup/OICRM4CA-07-01-P.sorted.cram \
+    -O /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Dedup/OICRM4CA-07-01-P.sorted.dedup.cram \
+    -M /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Dedup/OICRM4CA-07-01-P.metrics.txt \
+    --conf 'spark.local.dir=/cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/tmp' \
+    --tmp-dir /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/tmp \
+    -R /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/WholeGenomeFasta/Homo_sapiens_assembly38.fasta \
+    --CREATE_OUTPUT_CRAM_INDEX true \
+    --VALIDATION_STRINGENCY LENIENT \
+    --verbosity INFO
+
+#
+
+### CONTINUE FROM HERE
+# SAMTOOLS VIEW HEADER
+samtools view -H /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-07-01-P.dedup.cram | grep '^@RG'
+
+#variant calliing
+
+#freebayes
+#freebayes -f /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/WholeGenomeFasta/Homo_sapiens_assembly38.fasta /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-07-01-P.dedup.cram > OICRM4CA-07-01-P.freebayes.vcf
+
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=96G
+#SBATCH --time=7-00:00:00
+
+module load freebayes
+module load parallel
+
+fasta_generate_regions.py /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/WholeGenomeFasta/Homo_sapiens_assembly38.fasta.fai 5000000 > regions.txt
+freebayes-parallel regions.txt 32 \
+  -f /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/WholeGenomeFasta/Homo_sapiens_assembly38.fasta \
+  --min-coverage 10 \
+  --min-alternate-fraction 0.2 \
+  --min-alternate-count 3 \
+  --use-best-n-alleles 4 \
+  /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/VCF/OICRM4CA-07-01-P.sorted.dedup.cram \
+  >  /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/OICRM4CA-07-01-P.freebayes.vcf
+
+
+#GRIDDSS
+
+
+#Lofreq - germline calling & somatic calling
+lofreq call-parallel --pp-threads 4 \
+    -f /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/WholeGenomeFasta/Homo_sapiens_assembly38.fasta -o OICRM4CA-07-01-P.lofreq.vcf /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-07-01-P.dedup.cram
+
+
+#Strelka2 - first prepare config file below, then run the code after - somatic calling
+configureStrelkaGermlineWorkflow.py \
+    --bam /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-07-01-P.cram \
+    --referenceFasta ref.fa \
+    --runDir strelka_run
+
+    #code to run strelka2: 
+    strelka_run/runWorkflow.py -m local -j 8
+
+
+    #Add GATKMutect 2, Vardict and platypus
+#VEP Annotation - annotate all 3, then filter variants and then compare it after using bcftools isec and venn diagram in R
+    vep -i OICRM4CA-07-01-P.freebayes.vcf \
+    --cache --offline \
+    --dir_cache /path/to/vep/cache \
+    --species homo_sapiens \
+    --assembly GRCh38 \
+    --vcf -o OICRM4CA-07-01-P.annotated.vep.vcf
+
+
+    #for structural calling
+#CNVKit
+    cnvkit.py batch /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-07-01-P.cram \
+    --reference flat_reference.cnn \
+    --output-dir cnvkit_out \
+    --fasta ref.fa \
+    --method wgs
+
+    #Add Pindel 
+    #Annotate for sv interpretation and driver using 
+    AnnotSV, SVScore, OncoKB/CIVIC, Cancer genome interpreter (CGI)
+
+    #Add sopme mutational signatures
+      SigProfilerExtractor, deconstructSigs, mutationalPatterns (R) and SigFit
+
+
+
+      #for cnv calling
+      consider CNVkit, contorl freec, sequenza
+
+      #for predicting HRD
+      scarHRD (R package), SigMA, LOH-HR
+
+      #for predicting origin - uses mutation based origin predictors
+      Tumortracer, SCOPE, DeepGestalt/OncoNPC
+
+    #QC + Coverage
+    samtools flagstat /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-07-01-P.cram > qc.flagstat.txt
+samtools stats /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-07-01-P.cram > qc.stats.txt
+qualimap bamqc -bam /cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams/OICRM4CA-07-01-P.cram -outdir qc_bamqc
