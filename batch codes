@@ -13,3 +13,6 @@ sacct --job JOBID # Check the status of a completed job
 #things to change, perl version, lik to VCF2MAF, VEP Version
 sinfo -o "%20P %10a %10l %10c %10m %10e %10D %N" #check memory on nodes
 squeue
+#to load conda, first load python3
+module load python3
+conda --- #to load conda, first load python3
