@@ -2,24 +2,27 @@
 #SBATCH --job-name=wgs_qc
 #SBATCH --output=qc_out.log
 #SBATCH --error=qc_err.log
-#SBATCH --time=04:00:00
-#SBATCH --mem=32G
-#SBATCH --cpus-per-task=2
-#SBATCH --partition=short
+#SBATCH --time=5-00:00:00
+#SBATCH --mem=24G
+#SBATCH --cpus-per-task=8  # Increase CPU to handle more threads
+#SBATCH -A pughlab
 
 # Load modules
 module load samtools
 module load picard
 module load multiqc
 
+
 # Set paths
-CRAM_DIR="/cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams" # inlcude input directory here
-OUT_DIR="/cluster/home/t922316uhn/qc_results" # include output directory here
+CRAM_DIR="/cluster/projects/pughlab/myeloma/external_data/ultimagen-oicr/Crams"
+OUT_DIR="/cluster/home/t922316uhn/qc_results2"
 mkdir -p "$OUT_DIR"
+
+# Config: max number of parallel jobs
+MAX_JOBS=3  # Tune based on available resources
 
 # List of CRAM files
 CRAMS=(
-    OICRM4CA-07-01-P.cram
     OICRM4CA-08-01-P.cram
     OICRM4FZ-08-01-P.cram
     OICRM4FZ-09-01-P.cram
@@ -29,36 +32,60 @@ CRAMS=(
     OICRM4VA-09-01-P.cram
 )
 
-# Loop through each file
-for CRAM in "${CRAMS[@]}"; do
+# Function for QC
+run_qc() {
+    CRAM="$1"
     SAMPLE=$(basename "$CRAM" .cram)
     CRAM_PATH="${CRAM_DIR}/${CRAM}"
     OUT_PREFIX="${OUT_DIR}/${SAMPLE}"
 
-    echo "Processing $SAMPLE..."
+    echo "[START] $SAMPLE"
 
-    # 1. Samtools basic QC
-    samtools flagstat "$CRAM_PATH" > "${OUT_PREFIX}.flagstat.txt"
-    samtools stats "$CRAM_PATH" > "${OUT_PREFIX}.stats.txt"
+    # Samtools QC
+    samtools flagstat -@ 4 "$CRAM_PATH" > "${OUT_PREFIX}.flagstat.txt"
+    samtools stats -@ 4 "$CRAM_PATH" > "${OUT_PREFIX}.stats.txt"
 
-    # 2. Estimate mean depth
-    samtools depth -a "$CRAM_PATH" | \
-        awk '{sum+=$3} END {if (NR > 0) print "Average depth for '$SAMPLE' = ", sum/NR; else print "No data"}' \
+    # Depth
+    samtools depth -a -@ 4 "$CRAM_PATH" | \
+        awk '{sum+=$3} END {if (NR > 0) print "Average depth for '"$SAMPLE"' = ", sum/NR; else print "No data"}' \
         > "${OUT_PREFIX}.depth.txt"
 
-    # 3. Picard - Duplicates
-    picard MarkDuplicates I="$CRAM_PATH" O=/dev/null M="${OUT_PREFIX}.dup_metrics.txt" REMOVE_DUPLICATES=false
+    # Picard - Duplicates
+    picard MarkDuplicates \
+        I="$CRAM_PATH" \
+        O=/dev/null \
+        M="${OUT_PREFIX}.dup_metrics.txt" \
+        REMOVE_DUPLICATES=false \
+        VALIDATION_STRINGENCY=LENIENT
 
-    # 4. Picard - Insert Size
+    # Picard - Insert Size
     picard CollectInsertSizeMetrics \
         I="$CRAM_PATH" \
         O="${OUT_PREFIX}.insert_metrics.txt" \
         H="${OUT_PREFIX}.insert_histogram.pdf" \
-        M=0.5
+        M=0.5 \
+        VALIDATION_STRINGENCY=LENIENT
+
+    echo "[DONE] $SAMPLE"
+}
+
+# Parallel loop
+job_count=0
+for CRAM in "${CRAMS[@]}"; do
+    run_qc "$CRAM" &
+    ((job_count++))
+
+    # Wait if max parallel jobs running
+    if (( job_count % MAX_JOBS == 0 )); then
+        wait
+    fi
 done
 
-# 5. Generate MultiQC report
+wait  # Final wait to ensure all jobs finish
+
+# MultiQC summary
 cd "$OUT_DIR"
 multiqc . -n multiqc_report.html
 
-echo "QC complete! Results saved in $OUT_DIR"
+echo "✅ QC complete! Results saved in $OUT_DIR"
+(END)
