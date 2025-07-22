@@ -1,0 +1,26 @@
+[general]
+chrLenFile = /cluster/home/t922316uhn/FREEC/Homo_sapiens_assembly38.fixed.len
+window = 50000
+step = 10000
+ploidy = 2
+breakPointThreshold = 0.6
+intercept = 1
+minMappabilityPerWindow = 0.85
+outputDir = /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/FREEC
+#contaminationAdjustment = TRUE
+#minimalSubclonePresence = 0.2
+sex = XY
+breakPointType = 4
+#coefficientOfVariation = 0.05
+gemMappabilityFile = /cluster/home/t922316uhn/FREEC/FREEC-11.6b/mappability/out100m2_hg38.gem
+chrFiles = /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/Chromosomes
+minExpectedGC = 0.35
+maxExpectedGC = 0.55
+sambamba = sambamba
+SambambaThreads = 4
+uniqueMatch = TRUE
+
+[sample]
+mateFile = /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Bam/OICRM4CA-07-01-P.bam
+matesOrientation = 0
+inputFormat = BAM
