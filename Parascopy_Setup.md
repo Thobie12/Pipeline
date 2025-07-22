@@ -16,5 +16,3 @@ parascopy cn -I /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pip
 # variant calling
 parascopy call -p /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Parascopy/CA-07/analysis1 -f genome.fa -t /cluster/home/t922316uhn/parascopy/homology/homology_table/hg38.bed.gz -f /cluster/tools/data/genomes/human/hg38/iGenomes/Sequence/WholeGenomeFasta/genome.fa
 
-
-
