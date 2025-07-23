@@ -20,3 +20,5 @@ gatk Mutect2 \
   --native-pair-hmm-threads 4 \
   -O /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/GATK/OICRM4CA-07-01-P.vcf.gz
 
+
+
