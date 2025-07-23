@@ -20,15 +20,23 @@ cat makeGraph_Chromosome.R | R --slave --args 19 2 chr_19.noDup0.pileup.gz_ratio
 #!/bin/bash
 
 #SBATCH --job-name=FREEC
-#SBATCH --output=/cluster/home/t922316uhn/PLO_%j.out
-#SBATCH --error=/cluster/home/t922316uhn/PLO_%j.err
-#SBATCH --time=7-00:00:00
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=128G
+#SBATCH --output=/cluster/home/t922316uhn/FREEC/test_%j.out
+#SBATCH --error=/cluster/home/t922316uhn/FREEC/test_%j.err
+#SBATCH --time=2:00:00
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=24G
 #SBATCH --partition=pughlab
 
 module load samtools
 module load R
 module load sambamba
 
-/cluster/home/t922316uhn/FREEC/FREEC-11.6b/src/freec    -conf /cluster/home/t922316uhn/FREEC/Configs/CA-07.txt #running test file
+
+#/cluster/home/t922316uhn/FREEC/FREEC-11.6b/src/freec -conf config_chr19.txt 
+
+
+
+/cluster/home/t922316uhn/FREEC/FREEC-11.6b/src/freec    -conf /cluster/home/t922316uhn/FREEC/Configs/CA-07.txt #use this for running acc file
+
+
+
