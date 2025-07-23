@@ -13,7 +13,7 @@ sex = XY
 breakPointType = 4
 #coefficientOfVariation = 0.05
 gemMappabilityFile = /cluster/home/t922316uhn/FREEC/FREEC-11.6b/mappability/out100m2_hg38.gem
-chrFiles = /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/Chromosomes
+chrFiles = /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/Chromosomes/
 minExpectedGC = 0.35
 maxExpectedGC = 0.55
 sambamba = sambamba
@@ -24,3 +24,51 @@ uniqueMatch = TRUE
 mateFile = /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Bam/OICRM4CA-07-01-P.bam
 matesOrientation = 0
 inputFormat = BAM
+
+
+
+
+---
+
+[general]
+chrLenFile = /cluster/home/t922316uhn/FREEC/Homo_sapiens_assembly38.fixed.len
+#window = 50000
+
+#step = 10000
+ploidy = 2
+#breakPointThreshold = -.001
+
+#GCcontentProfile = GC_profile.cnp
+
+intercept=1
+minMappabilityPerWindow = 0.7
+
+outputDir = .
+
+sex=XY
+breakPointType=4
+
+gemMappabilityFile = /cluster/home/t922316uhn/FREEC/FREEC-11.6b/mappability/out100m2_hg38.gem
+chrFiles = /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/Chromosomes
+
+#degree=3
+coefficientOfVariation = 0.05
+#gemMappabilityFile = /hg19/out76_hg19.gem
+#chrFiles = /hg19/chromosomes
+
+sambamba = sambamba
+SambambaThreads = 8
+
+[sample]
+
+
+mateFile = /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Bam/OICRM4CA-07-01-P.bam
+
+#mateCopyNumberFile = chr_19.noDup0.pileup.gz_sample.cpn
+
+matesOrientation = 0
+inputFormat = BAM
+
+[control]
+
+[BAF]
