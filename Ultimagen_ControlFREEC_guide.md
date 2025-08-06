@@ -100,3 +100,36 @@ singularity exec -B /cluster:/cluster $SIF_PATH \
   awk '{if($4=="."){print $1"\t"$2"\t"0}else{print $1"\t"$2"\t"$4}}' | \
   grep -v "chrY" | \
   sed 's/^chr//' > "$OUTPUT_CPN"
+
+
+
+# running control FREEC
+
+# create controlFREEC config file
+generate_controlFREEC_config \
+	--sample_name OICRM4CA-07-01-P \
+	--BedGraphOutput TRUE \
+	--chrLenFile /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/WholeGenomeFasta/Homo_sapiens_assembly38.fasta.fai \
+	--contaminationAdjustment TRUE \
+	--maxThreads 8 \
+	--window 1000 \
+	--chrFiles /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/Chromosomes \
+	--degree 3 \
+	--gemMappabilityFile /cluster/tools/data/genomes/human/GRCh38/iGenomes/Annotation/Control-FREEC/out100m2_hg38.gem \
+	--forceGCcontentNormalization 1 \
+	--sample_mateFile /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/Bam/OICRM4CA-07-01-P.bam \
+	--sample_mateCopyNumberFile /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/FREEC/OICRM4CA-07-01-P/OICRM4CA-07-01-P.cpn \
+	--sample_miniPileupFile /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/FREEC/OICRM4CA-07-01-P/OICRM4CA-07-01-P_minipileup.pileup \ double check format??
+	--sample_inputFormat BAM \
+	--sample_mateOrientation 0 \ #ignore this
+	--control_mateFile {normal}.bam \
+	--control_mateCopyNumberFile {normal}.cpn \ # ignore this
+	--control_miniPileupFile {normal}.mpileup \ # ignore this 
+	--control_inputFormat BAM \ # ignore this
+	--control_mateOrientation 0 \ #ignore this
+	--baf_makePileup /cluster/tools/data/genomes/human/GRCh38/iGenomes/Annotation/GATKBundle/af-only-gnomad.hg38.vcf.gz \
+	--baf_fastaFile /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/WholeGenomeFasta/Homo_sapiens_assembly38.fasta \
+	--baf_SNPfile /cluster/tools/data/genomes/human/GRCh38/iGenomes/Annotation/GATKBundle/af-only-gnomad.hg38.vcf.gz
+
+# run controlFREEC
+/freec -conf {sample_name}.config.txt
