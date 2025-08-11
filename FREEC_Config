@@ -76,11 +76,12 @@ inputFormat = BAM
 
 --------------------
 [general]
-chrLenFile = /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/WholeGenomeFasta/Homo_sapiens_assembly38.fasta.fai
+chrLenFile = /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/ref/WholeGenomeFasta/Homo_sapiens_assembly38.fasta.fai
 chrFiles = /cluster/tools/data/genomes/human/GRCh38/iGenomes/Sequence/Chromosomes
 window = 1000
 maxThreads = 8
 degree = 3
+outputDir = /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/FREEC
 BedGraphOutput = TRUE
 contaminationAdjustment = TRUE
 gemMappabilityFile = /cluster/tools/data/genomes/human/GRCh38/iGenomes/Annotation/Control-FREEC/out100m2_hg38.gem
@@ -91,7 +92,7 @@ mateFile = /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline
 inputFormat = BAM
 mateOrientation = 0
 mateCopyNumberFile = /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/FREEC/OICRM4CA-07-01-P/OICRM4CA-07-01-P.cpn
-miniPileupFile = /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/FREEC/OICRM4CA-07-01-P/OICRM4CA-07-01-P_minipileup.pileup
+#miniPileupFile = /cluster/projects/pughlab/myeloma/projects/MM_cell_drugs/WGS_Pipeline/FREEC/OICRM4CA-07-01-P/OICRM4CA-07-01-P_minipileup.pileup
 
 [control]
 
